@@ -22,9 +22,9 @@ export function useTestAlarm() {
   const applyLiveReading = useDeviceStore((s) => s.applyLiveReading);
   const pushSocketLog = useDeviceStore((s) => s.pushSocketLog);
 
-  return useMutation({
-    mutationFn: async (deviceId?: string | null) => {
-      const id = resolveDeviceId(deviceId);
+  return useMutation<ControlResult, Error, void>({
+    mutationFn: async () => {
+      const id = resolveDeviceId();
       if (!id) throw new Error("No device selected");
       applyLiveReading({
         alarmActive: true,
@@ -53,9 +53,9 @@ export function useResetAlarm() {
   const applyLiveReading = useDeviceStore((s) => s.applyLiveReading);
   const pushSocketLog = useDeviceStore((s) => s.pushSocketLog);
 
-  return useMutation({
-    mutationFn: async (deviceId?: string | null) => {
-      const id = resolveDeviceId(deviceId);
+  return useMutation<ControlResult, Error, void>({
+    mutationFn: async () => {
+      const id = resolveDeviceId();
       if (!id) throw new Error("No device selected");
       applyLiveReading({
         alarmActive: false,
@@ -84,9 +84,9 @@ export function useEmergency() {
   const applyLiveReading = useDeviceStore((s) => s.applyLiveReading);
   const pushSocketLog = useDeviceStore((s) => s.pushSocketLog);
 
-  return useMutation({
-    mutationFn: async (deviceId?: string | null) => {
-      const id = resolveDeviceId(deviceId);
+  return useMutation<ControlResult, Error, void>({
+    mutationFn: async () => {
+      const id = resolveDeviceId();
       if (!id) throw new Error("No device selected");
       applyLiveReading({
         alarmActive: true,
@@ -113,14 +113,12 @@ export function useBuzzerControl() {
   const applyLiveReading = useDeviceStore((s) => s.applyLiveReading);
   const pushSocketLog = useDeviceStore((s) => s.pushSocketLog);
 
-  return useMutation({
-    mutationFn: async ({
-      on,
-      deviceId,
-    }: {
-      on: boolean;
-      deviceId?: string | null;
-    }) => {
+  return useMutation<
+    ControlResult,
+    Error,
+    { on: boolean; deviceId?: string | null }
+  >({
+    mutationFn: async ({ on, deviceId }) => {
       const id = resolveDeviceId(deviceId);
       if (!id) throw new Error("No device selected");
       applyLiveReading({
