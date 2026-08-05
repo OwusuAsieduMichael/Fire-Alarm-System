@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  DEVELOPER
+}
+
+enum DeviceStatus {
+  ONLINE
+  OFFLINE
+}
+
+enum AlertType {
+  FIRE
+  SMOKE
+  SYSTEM
+  SMS
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum SmsStatus {
+  PENDING
+  SENT
+  FAILED
+  NONE
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  theme     String   @default("dark")
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Device {
+  id               String           @id @default(cuid())
+  name             String
+  deviceKey        String           @unique
+  status           DeviceStatus     @default(OFFLINE)
+  wifiSsid         String?
+  ipAddress        String?
+  firmwareVersion  String?
+  lastSeen         DateTime?
+  smokeThreshold   Float            @default(300)
+  smokeCalibration Float            @default(0)
+  createdAt        DateTime         @default(now())
+  sensorReadings   SensorReading[]
+  alerts           Alert[]
+  connectionLogs   ConnectionLog[]
+}
+
+model SensorReading {
+  id            String   @id @default(cuid())
+  deviceId      String
+  device        Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  smokeLevel    Float
+  flameDetected Boolean  @default(false)
+  temperature   Float?
+  humidity      Float?
+  buzzerActive  Boolean  @default(false)
+  ledStatus     String   @default("off")
+  alarmActive   Boolean  @default(false)
+  lcdMessage    String?
+  createdAt     DateTime @default(now())
+
+  @@index([deviceId, createdAt])
+}
+
+model Alert {
+  id           String        @id @default(cuid())
+  deviceId     String
+  device       Device        @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  type         AlertType
+  severity     AlertSeverity
+  title        String
+  message      String
+  smsStatus    SmsStatus     @default(NONE)
+  acknowledged Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+
+  @@index([deviceId, createdAt])
+}
+
+model ConnectionLog {
+  id        String   @id @default(cuid())
+  deviceId  String
+  device    Device   @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  event     String
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([deviceId, createdAt])
+}
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

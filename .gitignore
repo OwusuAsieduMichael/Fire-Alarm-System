@@ -1,0 +1,14 @@
+node_modules
+dist
+.next
+.turbo
+.env
+.env.local
+*.db
+*.db-journal
+.DS_Store
+Thumbs.db
+*.log
+coverage
+.vscode
+.idea

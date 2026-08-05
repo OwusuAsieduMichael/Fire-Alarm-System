@@ -1,0 +1,27 @@
+{
+  "name": "fireguard-iot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FireGuard IoT — Premium fire alarm monitoring and control platform",
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c red,cyan \"npm run dev --prefix apps/api\" \"npm run dev --prefix apps/web\"",
+    "dev:web": "npm run dev --prefix apps/web",
+    "dev:api": "npm run dev --prefix apps/api",
+    "build": "npm run build --prefix apps/api && npm run build --prefix apps/web",
+    "start": "concurrently -n api,web -c red,cyan \"npm run start --prefix apps/api\" \"npm run start --prefix apps/web\"",
+    "setup": "powershell -ExecutionPolicy Bypass -File ./scripts/setup.ps1",
+    "db:generate": "npm run prisma:generate --prefix apps/api",
+    "db:push": "npm run prisma:push --prefix apps/api",
+    "db:seed": "npm run prisma:seed --prefix apps/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
