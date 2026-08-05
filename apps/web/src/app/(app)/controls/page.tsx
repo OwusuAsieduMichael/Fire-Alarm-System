@@ -57,7 +57,9 @@ export default function ControlsPage() {
           confirmDescription="This will activate the buzzer and red LED for a system test."
           confirmLabel="Start test"
           loading={testAlarm.isPending}
-          onConfirm={() => testAlarm.mutateAsync()}
+          onConfirm={async () => {
+            await testAlarm.mutateAsync();
+          }}
           index={0}
         />
         <ControlActionCard
@@ -69,7 +71,9 @@ export default function ControlsPage() {
           confirmDescription="Flame and alarm flags will be cleared on the device."
           confirmLabel="Reset now"
           loading={resetAlarm.isPending}
-          onConfirm={() => resetAlarm.mutateAsync()}
+          onConfirm={async () => {
+            await resetAlarm.mutateAsync();
+          }}
           index={1}
         />
         <ControlActionCard
@@ -81,7 +85,9 @@ export default function ControlsPage() {
           confirmDescription="This issues a critical emergency event to the ESP32."
           confirmLabel="Trigger emergency"
           loading={emergency.isPending}
-          onConfirm={() => emergency.mutateAsync()}
+          onConfirm={async () => {
+            await emergency.mutateAsync();
+          }}
           index={2}
         />
         <ControlActionCard
@@ -91,7 +97,9 @@ export default function ControlsPage() {
           tone="neutral"
           confirmLabel="Turn on"
           loading={buzzer.isPending && buzzer.variables?.on === true}
-          onConfirm={() => buzzer.mutateAsync({ on: true })}
+          onConfirm={async () => {
+            await buzzer.mutateAsync({ on: true });
+          }}
           index={3}
         />
         <ControlActionCard
@@ -101,7 +109,9 @@ export default function ControlsPage() {
           tone="neutral"
           confirmLabel="Turn off"
           loading={buzzer.isPending && buzzer.variables?.on === false}
-          onConfirm={() => buzzer.mutateAsync({ on: false })}
+          onConfirm={async () => {
+            await buzzer.mutateAsync({ on: false });
+          }}
           index={4}
         />
       </div>

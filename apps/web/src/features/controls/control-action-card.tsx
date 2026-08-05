@@ -28,7 +28,7 @@ interface ControlActionCardProps {
   confirmLabel?: string;
   loading?: boolean;
   disabled?: boolean;
-  onConfirm: () => void | Promise<void>;
+  onConfirm: () => void | Promise<unknown>;
   index?: number;
 }
 
