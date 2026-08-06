@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { staggerChild } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type ActionTone = "danger" | "warning" | "calm" | "neutral";
@@ -86,45 +84,43 @@ export function ControlActionCard({
 
   return (
     <>
-      <motion.div {...staggerChild(index)}>
-        <Card interactive className={cn("h-full", styles.card)}>
-          <CardContent className="flex h-full flex-col gap-5 p-5 sm:p-6">
-            <div
-              className={cn(
-                "flex h-12 w-12 items-center justify-center rounded-2xl",
-                styles.icon
-              )}
-            >
-              <Icon className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div className="flex-1 space-y-1.5">
-              <h3 className="text-[17px] font-semibold tracking-tight">
-                {title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {description}
-              </p>
-            </div>
-            <Button
-              variant={styles.button}
-              size="lg"
-              className="w-full"
-              disabled={disabled || loading}
-              onClick={() => setOpen(true)}
-              aria-label={title}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Working…
-                </>
-              ) : (
-                title
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
+      <Card className={cn("h-full", styles.card)}>
+        <CardContent className="flex h-full flex-col gap-4 p-4 sm:gap-5 sm:p-6">
+          <div
+            className={cn(
+              "flex h-11 w-11 items-center justify-center rounded-xl sm:h-12 sm:w-12 sm:rounded-2xl",
+              styles.icon
+            )}
+          >
+            <Icon className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <div className="flex-1 space-y-1.5">
+            <h3 className="text-[16px] font-semibold tracking-tight sm:text-[17px]">
+              {title}
+            </h3>
+            <p className="text-[13px] leading-relaxed text-muted-foreground sm:text-sm">
+              {description}
+            </p>
+          </div>
+          <Button
+            variant={styles.button}
+            size="lg"
+            className="w-full"
+            disabled={disabled || loading}
+            onClick={() => setOpen(true)}
+            aria-label={title}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Working…
+              </>
+            ) : (
+              title
+            )}
+          </Button>
+        </CardContent>
+      </Card>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="rounded-[1.35rem] sm:rounded-[1.35rem]">

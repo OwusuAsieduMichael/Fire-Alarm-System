@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { initials } from "@/lib/utils";
+import { HamburgerButton } from "./hamburger-button";
 import { SIDEBAR_NAV } from "./sidebar";
 
 const titles: Record<string, string> = Object.fromEntries(
@@ -30,9 +31,15 @@ const titles: Record<string, string> = Object.fromEntries(
 
 interface TopbarProps {
   onSearchClick?: () => void;
+  menuOpen?: boolean;
+  onMenuClick?: () => void;
 }
 
-export function Topbar({ onSearchClick }: TopbarProps) {
+export function Topbar({
+  onSearchClick,
+  menuOpen = false,
+  onMenuClick,
+}: TopbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -44,7 +51,13 @@ export function Topbar({ onSearchClick }: TopbarProps) {
     "FireGuard";
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-surface/85 px-4 backdrop-blur-2xl sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-[60] flex h-14 items-center gap-2 border-b border-border/60 bg-surface/85 px-3 backdrop-blur-2xl sm:gap-3 sm:px-6 lg:px-8">
+      <HamburgerButton
+        open={menuOpen}
+        onClick={() => onMenuClick?.()}
+        className="lg:hidden"
+      />
+
       <div className="min-w-0 lg:hidden">
         <h1 className="truncate text-[15px] font-semibold tracking-tight">
           {title}

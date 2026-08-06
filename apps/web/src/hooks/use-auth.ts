@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { storeAuthHandoff } from "@/lib/auth-handoff";
 import {
   authErrorMessage,
   isEmailNotConfirmedError,
@@ -51,17 +52,27 @@ export function useAuth() {
   const isAuthenticated = Boolean(token && user);
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (
+      email: string,
+      password: string,
+      options?: { phone?: string; quiet?: boolean }
+    ) => {
       try {
         const client = requireSupabase();
-        const trimmedEmail = email.trim();
+        const trimmedEmail = email.trim().toLowerCase();
+
+        // Confirm first so signup → login never hits inbox / rate limits.
+        await fetch("/api/auth/confirm-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimmedEmail }),
+        }).catch(() => null);
 
         let { data, error } = await client.auth.signInWithPassword({
           email: trimmedEmail,
           password,
         });
 
-        // Presentation: auto-confirm then retry so demo accounts reach the dashboard.
         if (error && isEmailNotConfirmedError(error)) {
           const confirmRes = await fetch("/api/auth/confirm-email", {
             method: "POST",
@@ -92,6 +103,14 @@ export function useAuth() {
           throw new Error("Sign-in failed. No session returned.");
         }
 
+        if (options?.phone) {
+          await ensureProfilePhone(
+            client,
+            data.session.user.id,
+            options.phone
+          );
+        }
+
         const profile = await fetchProfile(client, data.session.user.id);
         if (!profile) {
           throw new Error(
@@ -100,7 +119,9 @@ export function useAuth() {
         }
 
         setAuth(profile, data.session.access_token);
-        toast.success(`Welcome back, ${profile.name.split(" ")[0]}`);
+        if (!options?.quiet) {
+          toast.success(`Welcome back, ${profile.name.split(" ")[0]}`);
+        }
         router.replace("/dashboard");
         return { user: profile, accessToken: data.session.access_token };
       } catch (error) {
@@ -134,88 +155,89 @@ export function useAuth() {
     return true;
   }, []);
 
+  /** Presentation: server ensures confirmed account (no email), then adopts session. */
+  const presentationLogin = useCallback(async () => {
+    try {
+      const client = requireSupabase();
+      const res = await fetch("/api/auth/presentation", { method: "POST" });
+      const body = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        access_token?: string;
+        refresh_token?: string;
+      };
+
+      if (!res.ok) {
+        throw new Error(body.error || "Presentation login is unavailable.");
+      }
+      if (!body.access_token || !body.refresh_token) {
+        throw new Error("Presentation login returned no session.");
+      }
+
+      const { data, error } = await client.auth.setSession({
+        access_token: body.access_token,
+        refresh_token: body.refresh_token,
+      });
+      if (error) throw error;
+      if (!data.session?.user) {
+        throw new Error("Presentation session could not be established.");
+      }
+
+      const profile = await fetchProfile(client, data.session.user.id);
+      if (!profile) {
+        throw new Error(
+          "Presentation account profile is missing. Run supabase/schema.sql, then try again."
+        );
+      }
+
+      setAuth(profile, data.session.access_token);
+      toast.success(`Welcome, ${profile.name.split(" ")[0]}`);
+      router.replace("/dashboard");
+      return { user: profile, accessToken: data.session.access_token };
+    } catch (error) {
+      toast.error(
+        authErrorMessage(error, "Unable to enter presentation mode.")
+      );
+      throw error;
+    }
+  }, [setAuth, router]);
+
   const signUp = useCallback(
     async (input: SignUpInput) => {
       try {
-        const client = requireSupabase();
+        requireSupabase();
         const fullName = input.fullName.trim();
         const email = input.email.trim().toLowerCase();
         const phone = input.phone.trim();
 
-        const { data, error } = await client.auth.signUp({
-          email,
-          password: input.password,
-          options: {
-            data: {
-              name: fullName,
-              full_name: fullName,
-              phone,
-              sms: phone,
-            },
-          },
-        });
-
-        if (error) throw error;
-        if (!data.user) {
-          throw new Error("Sign-up failed. No user returned.");
-        }
-
-        // Email confirmation enabled → confirm for presentation, then sign in
-        if (!data.session) {
-          const confirmRes = await fetch("/api/auth/confirm-email", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email }),
-          });
-
-          if (confirmRes.ok) {
-            const signedIn = await client.auth.signInWithPassword({
-              email,
-              password: input.password,
-            });
-            if (signedIn.error) throw signedIn.error;
-            if (signedIn.data.session?.user) {
-              await ensureProfilePhone(
-                client,
-                signedIn.data.session.user.id,
-                phone
-              );
-              const profile = await fetchProfile(
-                client,
-                signedIn.data.session.user.id
-              );
-              if (!profile) {
-                throw new Error(
-                  "Account created but profile is missing. Run supabase/schema.sql, then sign in."
-                );
-              }
-              setAuth(profile, signedIn.data.session.access_token);
-              toast.success(`Welcome, ${profile.name.split(" ")[0]}`);
-              router.replace("/dashboard");
-              return { needsConfirmation: false as const, user: profile };
-            }
-          }
-
-          const params = new URLSearchParams({
-            verify: "pending",
+        // Admin create (confirmed, no confirmation email / rate limits).
+        const registerRes = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
             email,
-          });
-          router.replace(`/login?${params.toString()}`);
-          return { needsConfirmation: true as const };
-        }
+            password: input.password,
+            fullName,
+            phone,
+          }),
+        });
+        const registerBody = (await registerRes.json().catch(() => ({}))) as {
+          error?: string;
+        };
 
-        await ensureProfilePhone(client, data.session.user.id, phone);
-        const profile = await fetchProfile(client, data.session.user.id);
-        if (!profile) {
+        if (!registerRes.ok) {
           throw new Error(
-            "Account created but profile is missing. Run supabase/schema.sql (or patch-profile-phone.sql), then sign in."
+            registerBody.error || "Unable to create your account."
           );
         }
 
-        setAuth(profile, data.session.access_token);
-        toast.success(`Welcome, ${profile.name.split(" ")[0]}`);
-        router.replace("/dashboard");
-        return { needsConfirmation: false as const, user: profile };
+        storeAuthHandoff({
+          email,
+          password: input.password,
+          phone,
+        });
+        toast.success("Account ready — signing you in…");
+        router.replace("/login?autologin=1");
+        return { needsConfirmation: false as const, handoff: true as const };
       } catch (error) {
         toast.error(
           authErrorMessage(error, "Unable to create your account.")
@@ -223,7 +245,7 @@ export function useAuth() {
         throw error;
       }
     },
-    [setAuth, router]
+    [router]
   );
 
   const logout = useCallback(async () => {
@@ -254,6 +276,7 @@ export function useAuth() {
     isAuthenticated,
     login,
     signUp,
+    presentationLogin,
     resendConfirmationEmail,
     logout,
     setUser: updateUser,

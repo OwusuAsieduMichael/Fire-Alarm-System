@@ -156,8 +156,14 @@
   }
 
   .fg-press {
-    @apply transition-transform duration-150 active:scale-[0.98];
-    transition-timing-function: var(--ease-apple);
+    @apply transition-none;
+  }
+
+  @media (min-width: 1024px) {
+    .fg-press {
+      @apply transition-transform duration-150 active:scale-[0.98];
+      transition-timing-function: var(--ease-apple);
+    }
   }
 
   .workspace-canvas {
@@ -165,15 +171,21 @@
   }
 
   .card-interactive {
-    transition:
-      transform 0.28s var(--ease-spring),
-      box-shadow 0.28s var(--ease-apple),
-      border-color 0.2s var(--ease-apple);
+    /* Mobile stays flat; lift only on desktop */
   }
 
-  .card-interactive:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-elevated);
+  @media (min-width: 1024px) {
+    .card-interactive {
+      transition:
+        transform 0.28s var(--ease-spring),
+        box-shadow 0.28s var(--ease-apple),
+        border-color 0.2s var(--ease-apple);
+    }
+
+    .card-interactive:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-elevated);
+    }
   }
 
   .live-dot {
@@ -267,15 +279,6 @@
     @apply text-[17px] font-semibold tracking-tight text-foreground;
   }
 
-  .safe-bottom-nav {
-    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
-  }
-
-  @media (min-width: 1024px) {
-    .safe-bottom-nav {
-      padding-bottom: 0;
-    }
-  }
 }
 
 @layer utilities {

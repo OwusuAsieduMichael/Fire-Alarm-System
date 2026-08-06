@@ -3,11 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, UserRound } from "lucide-react";
 import { z } from "zod";
 import { EmailConfirmNotice } from "@/components/auth/email-confirm-notice";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  consumeAuthHandoff,
+  peekAuthHandoff,
+} from "@/lib/auth-handoff";
 import {
   authErrorMessage,
   isEmailNotConfirmedError,
@@ -36,6 +39,7 @@ function LoginForm() {
     password?: string;
   }>({});
   const [loading, setLoading] = React.useState(false);
+  const autoLoginTried = React.useRef(false);
 
   const [confirmNotice, setConfirmNotice] = React.useState<
     null | "pending" | "blocked"
@@ -55,17 +59,61 @@ function LoginForm() {
     } catch {
       // ignore
     }
+
+    const handoff = peekAuthHandoff();
+    if (handoff) {
+      setEmail(handoff.email);
+      setPassword(handoff.password);
+    }
   }, []);
 
   React.useEffect(() => {
     const verify = searchParams.get("verify");
     const emailParam = searchParams.get("email");
+    const shouldAuto = searchParams.get("autologin") === "1";
+
     if (verify === "pending") {
       setConfirmNotice("pending");
       if (emailParam) setEmail(emailParam);
       router.replace("/login", { scroll: false });
+      return;
     }
-  }, [searchParams, router]);
+
+    if (!shouldAuto || autoLoginTried.current) return;
+    autoLoginTried.current = true;
+
+    const handoff = consumeAuthHandoff();
+    if (!handoff) {
+      router.replace("/login", { scroll: false });
+      return;
+    }
+
+    setEmail(handoff.email);
+    setPassword(handoff.password);
+    setLoading(true);
+    setConfirmNotice(null);
+
+    void (async () => {
+      try {
+        try {
+          localStorage.setItem(REMEMBER_KEY, handoff.email);
+        } catch {
+          // ignore
+        }
+        await login(handoff.email, handoff.password, {
+          phone: handoff.phone,
+        });
+        // login navigates to /dashboard on success
+      } catch (error) {
+        if (isEmailNotConfirmedError(error)) {
+          setConfirmNotice("blocked");
+        }
+        router.replace("/login", { scroll: false });
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [searchParams, router, login]);
 
   React.useEffect(() => {
     if (cooldown <= 0) return;
@@ -149,7 +197,9 @@ function LoginForm() {
       <div className="space-y-2 text-center sm:text-left">
         <h1 className="text-3xl font-semibold tracking-tight">Login</h1>
         <p className="text-sm text-white/70">
-          Welcome back — sign in with your email and password.
+          {loading && searchParams.get("autologin") === "1"
+            ? "Signing you in with your new account…"
+            : "Welcome back — sign in with your email and password."}
         </p>
       </div>
 
@@ -276,7 +326,7 @@ function LoginForm() {
           Remember me
         </label>
 
-        <motion.div whileTap={{ scale: 0.985 }} className="pt-1">
+        <div className="pt-1">
           <button
             type="submit"
             disabled={loading}
@@ -292,7 +342,7 @@ function LoginForm() {
               "Login"
             )}
           </button>
-        </motion.div>
+        </div>
       </form>
 
       <p className="text-center text-sm text-white/65">

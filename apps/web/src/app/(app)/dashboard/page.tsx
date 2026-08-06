@@ -35,7 +35,7 @@ export default function DashboardPage() {
         : "safe";
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-5 sm:space-y-7">
       <PageHeader
         eyebrow="Overview"
         title="Home"
@@ -45,13 +45,13 @@ export default function DashboardPage() {
 
       <StatusHero />
 
-      <section aria-label="Live sensors" className="space-y-4">
+      <section aria-label="Live sensors" className="space-y-3 sm:space-y-4">
         <div>
           <p className="metric-label">Telemetry</p>
           <h2 className="section-title mt-1">Live sensors</h2>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
           <SensorCard
             title="Smoke Level"
             icon={Activity}
@@ -59,8 +59,6 @@ export default function DashboardPage() {
             unit="ppm"
             statusLabel={smokeTone === "alarm" ? "Elevated" : "Nominal"}
             statusTone={smokeTone}
-            index={0}
-            featured
           />
           <SensorCard
             title="Flame Detection"
@@ -70,8 +68,6 @@ export default function DashboardPage() {
             unit={live.flameDetected ? "DETECTED" : "CLEAR"}
             statusLabel={live.flameDetected ? "Alarm" : "Safe"}
             statusTone={live.flameDetected ? "alarm" : "safe"}
-            index={1}
-            featured
           />
           <SensorCard
             title="Temperature"
@@ -80,7 +76,6 @@ export default function DashboardPage() {
             unit="°C"
             decimals={1}
             statusTone="info"
-            index={2}
           />
           <SensorCard
             title="Humidity"
@@ -89,7 +84,6 @@ export default function DashboardPage() {
             unit="%"
             decimals={0}
             statusTone="info"
-            index={3}
           />
           <SensorCard
             title="Buzzer"
@@ -99,7 +93,6 @@ export default function DashboardPage() {
             unit={live.buzzerActive ? "ON" : "OFF"}
             statusLabel={live.buzzerActive ? "Active" : "Idle"}
             statusTone={live.buzzerActive ? "warning" : "safe"}
-            index={4}
           />
           <SensorCard
             title="LED Status"
@@ -113,14 +106,13 @@ export default function DashboardPage() {
                   ? "warning"
                   : "safe"
             }
-            index={5}
           />
         </div>
       </section>
 
       <section
         aria-label="Trends and alerts"
-        className="grid gap-4 xl:grid-cols-5"
+        className="grid gap-3 sm:gap-4 xl:grid-cols-5"
       >
         <div className="xl:col-span-3">
           <SmokeChart threshold={threshold} />

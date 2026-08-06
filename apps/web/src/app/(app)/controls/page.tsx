@@ -28,7 +28,7 @@ export default function ControlsPage() {
   const buzzer = useBuzzerControl();
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-5 sm:space-y-7">
       <PageHeader
         eyebrow="Actions"
         title="Controls"
@@ -38,7 +38,7 @@ export default function ControlsPage() {
             <StatusPill
               label={live.alarmActive ? "Alarm active" : "System calm"}
               tone={live.alarmActive ? "alarm" : "safe"}
-              pulse={live.alarmActive}
+              pulse={false}
             />
             <StatusPill
               label={live.buzzerActive ? "Buzzer on" : "Buzzer off"}
@@ -48,7 +48,7 @@ export default function ControlsPage() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
         <ControlActionCard
           title="Test Alarm"
           description="Run a controlled alarm test with buzzer and LED feedback."

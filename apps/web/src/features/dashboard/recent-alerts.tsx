@@ -1,13 +1,11 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { BellRing } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
-import { listItemFade } from "@/lib/motion";
 import { useDeviceStore } from "@/stores/device-store";
 import type { Alert, AlertSeverity } from "@/types";
 import { cn } from "@/lib/utils";
@@ -28,11 +26,9 @@ const severityVariant: Record<
 
 function AlertItem({ alert }: { alert: Alert }) {
   return (
-    <motion.li
-      layout
-      {...listItemFade}
+    <li
       className={cn(
-        "rounded-[1.1rem] border border-border/60 bg-secondary/40 p-3.5 transition-colors hover:bg-secondary/70",
+        "rounded-[1.1rem] border border-border/60 bg-secondary/40 p-3.5",
         !alert.acknowledged && "border-l-[3px] border-l-ember"
       )}
     >
@@ -48,7 +44,7 @@ function AlertItem({ alert }: { alert: Alert }) {
       <p className="mt-2 text-[11px] text-muted-foreground">
         {formatDistanceToNow(new Date(alert.createdAt), { addSuffix: true })}
       </p>
-    </motion.li>
+    </li>
   );
 }
 
@@ -77,11 +73,9 @@ export function RecentAlerts({ loading, limit = 6 }: RecentAlertsProps) {
           />
         ) : (
           <ul className="space-y-2.5">
-            <AnimatePresence initial={false} mode="popLayout">
-              {alerts.map((alert) => (
-                <AlertItem key={alert.id} alert={alert} />
-              ))}
-            </AnimatePresence>
+            {alerts.map((alert) => (
+              <AlertItem key={alert.id} alert={alert} />
+            ))}
           </ul>
         )}
       </CardContent>

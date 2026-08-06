@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, Phone, UserRound } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/use-auth";
@@ -194,7 +193,7 @@ export default function SignUpPage() {
           ) : null}
         </div>
 
-        <motion.div whileTap={{ scale: 0.985 }} className="pt-1">
+        <div className="pt-1">
           <button
             type="submit"
             disabled={loading}
@@ -210,7 +209,7 @@ export default function SignUpPage() {
               "Create account"
             )}
           </button>
-        </motion.div>
+        </div>
       </form>
 
       <p className="text-center text-sm text-white/65">

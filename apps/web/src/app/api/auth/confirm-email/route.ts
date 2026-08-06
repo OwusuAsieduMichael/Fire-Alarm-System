@@ -14,15 +14,18 @@ export async function POST(request: Request) {
     request.headers.get("x-real-ip") ||
     "unknown";
 
-  const limited = rateLimit(`confirm-email:${ip}`, 10, 60_000);
-  if (!limited.ok) {
-    return NextResponse.json(
-      { error: "Too many requests. Try again shortly." },
-      {
-        status: 429,
-        headers: { "Retry-After": String(limited.retryAfterSec) },
-      }
-    );
+  // Presentation demos skip the tight limit so confirm+retry is not blocked.
+  if (process.env.PRESENTATION_AUTH_ENABLED !== "true") {
+    const limited = rateLimit(`confirm-email:${ip}`, 10, 60_000);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: "Too many requests. Try again shortly." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSec) },
+        }
+      );
+    }
   }
 
   const admin = createSupabaseAdminClient();

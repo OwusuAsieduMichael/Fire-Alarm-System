@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import {
   Bell,
   Gauge,
@@ -15,7 +14,6 @@ import {
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { ConnectionBadge } from "@/components/shared/connection-badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { springSoft } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
 import type { UserRole } from "@/types";
@@ -81,18 +79,17 @@ function NavLink({
       )}
       aria-current={active ? "page" : undefined}
     >
-      {active ? (
-        <motion.span
-          layoutId="sidebar-active"
-          className="absolute inset-0 rounded-[12px] bg-card shadow-soft ring-1 ring-border/60"
-          transition={springSoft}
-        />
-      ) : (
-        <span className="absolute inset-0 rounded-[12px] opacity-0 transition-opacity hover:bg-foreground/[0.04] hover:opacity-100 dark:hover:bg-white/[0.05]" />
-      )}
+      <span
+        className={cn(
+          "absolute inset-0 rounded-[12px]",
+          active
+            ? "bg-card shadow-soft ring-1 ring-border/60"
+            : "opacity-0 hover:bg-foreground/[0.04] hover:opacity-100 dark:hover:bg-white/[0.05]"
+        )}
+      />
       <Icon
         className={cn(
-          "relative z-10 h-[17px] w-[17px] shrink-0 transition-opacity",
+          "relative z-10 h-[17px] w-[17px] shrink-0",
           active ? "opacity-100" : "opacity-70"
         )}
       />

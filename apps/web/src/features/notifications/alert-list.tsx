@@ -1,13 +1,11 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { format, formatDistanceToNow } from "date-fns";
 import { BellOff, Check, MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
-import { listItemFade, springSoft } from "@/lib/motion";
 import type { Alert, AlertSeverity, SmsStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -59,19 +57,15 @@ export function AlertList({
 
   return (
     <ul className="space-y-3">
-      <AnimatePresence initial={false} mode="popLayout">
-        {alerts.map((alert) => (
-          <motion.li
-            key={alert.id}
-            layout
-            {...listItemFade}
-            transition={springSoft}
-            className={cn(
-              "rounded-[1.25rem] border border-border/70 border-l-[3px] bg-card p-4 shadow-soft transition-shadow duration-200 hover:shadow-elevated sm:p-5",
-              severityStyles[alert.severity],
-              alert.acknowledged && "opacity-65"
-            )}
-          >
+      {alerts.map((alert) => (
+        <li
+          key={alert.id}
+          className={cn(
+            "rounded-[1.15rem] border border-border/70 border-l-[3px] bg-card p-3.5 shadow-soft sm:rounded-[1.25rem] sm:p-5",
+            severityStyles[alert.severity],
+            alert.acknowledged && "opacity-65"
+          )}
+        >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
@@ -135,9 +129,8 @@ export function AlertList({
                 )}
               </div>
             </div>
-          </motion.li>
-        ))}
-      </AnimatePresence>
+        </li>
+      ))}
     </ul>
   );
 }

@@ -1,10 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LiveValue } from "@/components/shared/live-value";
-import { staggerChild } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 interface SensorCardProps {
@@ -42,27 +40,20 @@ export function SensorCard({
   unit,
   statusLabel,
   statusTone = "info",
-  index = 0,
   className,
   featured,
 }: SensorCardProps) {
   return (
-    <motion.div
-      {...staggerChild(index)}
-      className={cn(featured && "sm:col-span-2 xl:col-span-1", className)}
-    >
-      <Card
-        interactive
-        className={cn("group h-full", toneBorder[statusTone])}
-      >
-        <CardContent className="flex h-full flex-col gap-5 p-5 sm:p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1">
-              <p className="metric-label">{title}</p>
+    <div className={cn(featured && "col-span-2 sm:col-span-1", className)}>
+      <Card className={cn("h-full", toneBorder[statusTone])}>
+        <CardContent className="flex h-full flex-col gap-3 p-3.5 sm:gap-5 sm:p-6">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 space-y-0.5">
+              <p className="metric-label truncate">{title}</p>
               {statusLabel ? (
                 <p
                   className={cn(
-                    "text-[12px] font-semibold",
+                    "text-[11px] font-semibold sm:text-[12px]",
                     statusTone === "safe" && "text-success",
                     statusTone === "alarm" && "text-ember",
                     statusTone === "warning" && "text-warning",
@@ -75,11 +66,11 @@ export function SensorCard({
             </div>
             <div
               className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-[14px] transition-transform duration-300 group-hover:scale-[1.04]",
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 sm:rounded-[14px]",
                 toneIcon[statusTone]
               )}
             >
-              <Icon className="h-4 w-4" aria-hidden="true" />
+              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
             </div>
           </div>
 
@@ -88,15 +79,15 @@ export function SensorCard({
               value={value}
               decimals={decimals}
               unit={unit}
-              className="text-[1.85rem] font-semibold tracking-[-0.03em]"
+              className="text-[1.45rem] font-semibold tracking-[-0.03em] sm:text-[1.85rem]"
             />
           ) : (
-            <span className="text-[1.85rem] font-semibold tracking-[-0.03em]">
+            <span className="text-[1.45rem] font-semibold tracking-[-0.03em] sm:text-[1.85rem]">
               {statusLabel}
             </span>
           )}
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
