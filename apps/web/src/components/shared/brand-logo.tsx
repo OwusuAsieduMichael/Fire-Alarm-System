@@ -14,7 +14,7 @@ export function BrandLogo({
 }: BrandLogoProps) {
   return (
     <Image
-      src="/fireguard-logo.png"
+      src="/FLAMELOGO.png"
       alt="FireGuard"
       width={size}
       height={size}
