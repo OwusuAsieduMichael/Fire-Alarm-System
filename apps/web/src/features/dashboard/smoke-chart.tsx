@@ -95,7 +95,13 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
                     boxShadow: "var(--shadow-elevated)",
                   }}
                   labelStyle={{ color: "hsl(var(--muted-foreground))" }}
-                  formatter={(value: number) => [`${value.toFixed(0)} ppm`, "Smoke"]}
+                  formatter={(value) => {
+                    const n = typeof value === "number" ? value : Number(value);
+                    return [
+                      `${Number.isFinite(n) ? n.toFixed(0) : "—"} ppm`,
+                      "Smoke",
+                    ];
+                  }}
                 />
                 <Area
                   type="monotone"
