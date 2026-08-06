@@ -1,9 +1,11 @@
 import { getBearer, error, isResponse, json, requireUser } from "@/server/http";
+import type { Database } from "@/lib/supabase/database.types";
 import { mapDevice, mapLog, userDb } from "@/server/supabase-data";
 
 export const runtime = "nodejs";
 
 type Ctx = { params: Promise<{ id: string }> };
+type DeviceUpdate = Database["public"]["Tables"]["devices"]["Update"];
 
 export async function GET(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
@@ -55,7 +57,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
     smokeCalibration?: number;
   };
 
-  const patch: Record<string, unknown> = {};
+  const patch: DeviceUpdate = {};
   if (typeof body.name === "string") patch.name = body.name;
   if (typeof body.wifiSsid === "string") patch.wifi_ssid = body.wifiSsid;
   if (typeof body.smokeThreshold === "number") {
@@ -65,7 +67,6 @@ export async function PATCH(req: Request, ctx: Ctx) {
     patch.smoke_calibration = body.smokeCalibration;
   }
 
-  // developers_update policy only allows DEVELOPER role in profiles
   const { data, error: updateError } = await db
     .from("devices")
     .update(patch)

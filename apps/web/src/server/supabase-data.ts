@@ -123,7 +123,7 @@ export function readingToLive(
     return {
       ...offlineLive(device),
       status: connected ? "ONLINE" : "OFFLINE",
-      lastSeen: device.lastSeen,
+      lastSeen: device.lastSeen ?? null,
       realDeviceConnected: connected,
       lcdMessage: connected ? "Monitoring…" : "Waiting for ESP32…",
     };
@@ -133,12 +133,13 @@ export function readingToLive(
     deviceId: device.id,
     smokeLevel: reading.smokeLevel,
     flameDetected: reading.flameDetected,
-    temperature: reading.temperature,
-    humidity: reading.humidity,
+    temperature: reading.temperature ?? null,
+    humidity: reading.humidity ?? null,
     buzzerActive: reading.buzzerActive,
     ledStatus: reading.ledStatus,
     alarmActive: reading.alarmActive,
-    lcdMessage: reading.lcdMessage || (connected ? "Monitoring…" : "Waiting for ESP32…"),
+    lcdMessage:
+      reading.lcdMessage || (connected ? "Monitoring…" : "Waiting for ESP32…"),
     status: connected ? "ONLINE" : "OFFLINE",
     lastSeen: reading.createdAt,
     realDeviceConnected: connected,
