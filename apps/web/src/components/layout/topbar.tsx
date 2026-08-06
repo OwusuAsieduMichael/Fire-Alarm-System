@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { ConnectionBadge } from "@/components/shared/connection-badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -108,9 +108,6 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
             aria-label="User menu"
           >
             <Avatar className="h-10 w-10">
-              {user?.avatarUrl ? (
-                <AvatarImage src={user.avatarUrl} alt={user.name} />
-              ) : null}
               <AvatarFallback>{initials(user?.name)}</AvatarFallback>
             </Avatar>
           </Button>
