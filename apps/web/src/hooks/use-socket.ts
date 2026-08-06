@@ -37,7 +37,7 @@ function serializeLive(payload: Record<string, unknown>): Partial<LiveDeviceStat
   };
 }
 
-export function useSocket() {
+export function useSocket(enabled = true) {
   const token = useAuthStore((s) => s.token);
   const connectionStatus = useDeviceStore((s) => s.connectionStatus);
   const setConnectionStatus = useDeviceStore((s) => s.setConnectionStatus);
@@ -47,6 +47,11 @@ export function useSocket() {
   const selectedDeviceId = useDeviceStore((s) => s.selectedDeviceId);
 
   useEffect(() => {
+    if (!enabled) {
+      disconnectSocket();
+      return;
+    }
+
     if (!token) {
       disconnectSocket();
       setConnectionStatus("disconnected");
@@ -147,6 +152,7 @@ export function useSocket() {
       socket.off("control:ack", onControlAck);
     };
   }, [
+    enabled,
     token,
     selectedDeviceId,
     setConnectionStatus,

@@ -1,118 +1,87 @@
 # FireGuard IoT
 
-Premium fire alarm monitoring and control platform for ESP32-powered systems.
+Premium fire alarm monitoring **web app**.
 
-Monorepo:
+## Recommended architecture
 
-- `apps/web` — Next.js App Router dashboard (TypeScript, Tailwind, Framer Motion, React Query, Zustand, Socket.IO, Recharts)
-- `apps/api` — NestJS API (JWT auth, Prisma, Socket.IO, ESP32 simulator)
-- `firmware/fireguard_esp32` — ESP32 sketch for live telemetry + control
-
-## Quick start
-
-### Prerequisites
-
-- Node.js 20+
-- npm 10+
-
-### Install
-
-On Windows, preferred one-shot setup:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\setup.ps1
+```
+Browser (Vercel / Next.js UI)
+    │
+    ▼  /api/*
+Next.js API routes (CORS-safe proxy)
+    │
+    ▼  GAS_SCRIPT_URL
+Google Apps Script backend (auth, sensors, controls, simulator)
 ```
 
-Or manually (install each app if workspace install fails):
+- **Frontend:** Next.js on Vercel  
+- **Backend:** Google Apps Script web app  
+- NestJS in `apps/api` is optional (local/hardware only)
 
-```bash
-cd apps/api && npm install --legacy-peer-deps
-cd ../web && npm install --legacy-peer-deps
-cd ../.. && npm install --legacy-peer-deps
-```
+---
 
-### Database (SQLite for local demo)
+## 1) Deploy Google Apps Script backend
 
-```bash
-cd apps/api
-npx prisma generate
-npx prisma db push
-npx ts-node prisma/seed.ts
-```
+See full steps in [`gas/README.md`](./gas/README.md).
 
-> Production can point Prisma at PostgreSQL/Supabase by changing `provider` and `DATABASE_URL` in `apps/api/prisma/schema.prisma` and `apps/api/.env`.
+Short version:
 
-### Run
+1. Create a new Apps Script project at [script.google.com](https://script.google.com)
+2. Paste [`gas/Code.gs`](./gas/Code.gs)
+3. Deploy → Web app → **Anyone** access
+4. Copy the `/exec` URL
 
-```bash
-npm run dev
-```
+## 2) Deploy frontend on Vercel
 
-- Web: http://localhost:3000
-- API: http://localhost:4000
+1. Import this GitHub repo
+2. Set **Root Directory** to `apps/web`
+3. Add environment variable:
 
-### Demo accounts
+| Name | Value |
+|------|--------|
+| `GAS_SCRIPT_URL` | `https://script.google.com/macros/s/.../exec` |
+
+4. Deploy
+
+Do **not** set `NEXT_PUBLIC_API_URL` on Vercel.
+
+## Demo logins
 
 | Role | Email | Password |
 |------|-------|----------|
 | Developer | `developer@fireguard.io` | `FireGuard@2026` |
 | User | `user@fireguard.io` | `FireGuard@2026` |
 
-Seeded device key: `FG-ESP32-DEMO-001`
+## Local development
+
+```bash
+cd apps/web
+npm install --legacy-peer-deps
+npm run dev
+```
+
+Without `GAS_SCRIPT_URL`, the app uses the built-in Next.js in-memory API + simulator.
+
+With GAS:
+
+```env
+GAS_SCRIPT_URL=https://script.google.com/macros/s/XXXX/exec
+```
+
+## Repo layout
+
+| Path | Purpose |
+|------|---------|
+| `apps/web` | Next.js UI + `/api` proxy |
+| `gas/` | Google Apps Script backend |
+| `apps/api` | Optional NestJS (ESP32 / Socket.IO) |
+| `firmware/` | ESP32 sketch |
 
 ## Features
 
-- Role-based auth (User / Developer)
-- Live dashboard with smoke charts and alert feed
-- LCD simulation, LED/buzzer visuals
-- Alarm test / reset / emergency / buzzer controls
-- Notifications with acknowledge
-- Settings: theme, smoke threshold, calibration
-- Developer diagnostics + debug console
-- Socket.IO realtime + automatic reconnect
-- Built-in ESP32 simulator when no hardware is connected
-
-## Environment
-
-### API (`apps/api/.env`)
-
-```env
-DATABASE_URL="file:./dev.db"
-JWT_SECRET="fireguard-dev-secret-change-in-production"
-JWT_EXPIRES_IN="7d"
-PORT=4000
-CORS_ORIGIN="http://localhost:3000"
-```
-
-### Web (`apps/web/.env.local`)
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:4000
-NEXT_PUBLIC_WS_URL=http://localhost:4000
-```
-
-## ESP32
-
-1. Flash `firmware/fireguard_esp32/fireguard_esp32.ino`
-2. Set WiFi + `SERVER_HOST` + `DEVICE_KEY`
-3. Device connects on Socket.IO namespace `/iot` with `deviceKey`
-4. Emits `sensor:data`; receives `control:command`
-
-While hardware is offline, the API simulator streams live values every 2 seconds.
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | API + web concurrently |
-| `npm run build` | Production build |
-| `npm run db:seed` | Seed users + demo device |
-
-## Architecture
-
-```
-Web (Next.js) ──REST/JWT──▶ NestJS API ──Prisma──▶ SQLite/Postgres
-       │                        │
-       └────── Socket.IO ───────┼──▶ Dashboard clients
-                                └──▶ ESP32 (/iot) + simulator
-```
+- Role-based login
+- Live smoke / flame / device status (2s polling)
+- LCD / LED / buzzer visuals
+- Alarm test, reset, emergency, buzzer controls
+- Alerts + acknowledge
+- Settings + developer diagnostics

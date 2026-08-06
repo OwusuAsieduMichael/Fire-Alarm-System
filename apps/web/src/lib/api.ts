@@ -1,6 +1,10 @@
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-  "http://localhost:4000";
+/**
+ * API client.
+ * - If NEXT_PUBLIC_API_URL is set → NestJS / external API
+ * - Otherwise → same-origin Next.js `/api/*` (Vercel-ready)
+ */
+const EXTERNAL_API =
+  process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "";
 
 export class ApiError extends Error {
   status: number;
@@ -26,6 +30,12 @@ function getToken(): string | null {
   }
 }
 
+function resolveUrl(path: string): string {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  if (EXTERNAL_API) return `${EXTERNAL_API}${p}`;
+  return p.startsWith("/api/") || p === "/api" ? p : `/api${p}`;
+}
+
 export type ApiRequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
   token?: string | null;
@@ -39,7 +49,7 @@ export async function api<T = unknown>(
   const { body, token, skipAuth, headers, ...rest } = options;
   const authToken = skipAuth ? null : (token ?? getToken());
 
-  const res = await fetch(`${API_URL}${path.startsWith("/") ? path : `/${path}`}`, {
+  const res = await fetch(resolveUrl(path), {
     ...rest,
     headers: {
       Accept: "application/json",
@@ -60,7 +70,9 @@ export async function api<T = unknown>(
         ? Array.isArray((data as { message: unknown }).message)
           ? ((data as { message: string[] }).message).join(", ")
           : String((data as { message: unknown }).message)
-        : null) || res.statusText || "Request failed";
+        : null) ||
+      res.statusText ||
+      "Request failed";
     throw new ApiError(message, res.status, data);
   }
 
@@ -80,4 +92,5 @@ export const apiClient = {
     api<T>(path, { ...options, method: "DELETE" }),
 };
 
-export { API_URL };
+export const API_URL = EXTERNAL_API || "/api";
+export const USE_EXTERNAL_API = Boolean(EXTERNAL_API);
