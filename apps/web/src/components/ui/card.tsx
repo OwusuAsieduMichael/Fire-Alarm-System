@@ -8,7 +8,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-[1.35rem] border border-black/[0.045] bg-card text-card-foreground shadow-soft dark:border-white/[0.06]",
+      "rounded-[1.35rem] border border-border/75 bg-card/95 text-card-foreground shadow-soft backdrop-blur-[2px] dark:border-white/[0.06] dark:bg-card",
       interactive && "card-interactive cursor-default",
       className
     )}

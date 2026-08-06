@@ -46,7 +46,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
     "FireGuard";
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-black/[0.05] bg-background/55 px-4 backdrop-blur-2xl dark:border-white/[0.06] sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/70 bg-surface/70 px-4 backdrop-blur-2xl dark:border-white/[0.06] dark:bg-background/55 sm:px-6 lg:px-8">
       <Button
         variant="ghost"
         size="icon"
@@ -67,12 +67,12 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
         <button
           type="button"
           onClick={onSearchClick}
-          className="flex h-9 w-full items-center gap-2 rounded-full border border-black/[0.06] bg-black/[0.03] px-3.5 text-left text-[13px] text-muted-foreground transition-colors hover:bg-black/[0.05] dark:border-white/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.07]"
+          className="flex h-9 w-full items-center gap-2 rounded-full border border-border/80 bg-card/80 px-3.5 text-left text-[13px] text-muted-foreground shadow-soft transition-colors hover:bg-card dark:border-white/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.07]"
           aria-label="Open command palette"
         >
           <Search className="h-3.5 w-3.5 shrink-0 opacity-70" />
           <span className="flex-1 truncate">Search</span>
-          <kbd className="rounded-md bg-black/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground dark:bg-white/[0.06]">
+          <kbd className="rounded-md bg-foreground/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground dark:bg-white/[0.06]">
             ⌘K
           </kbd>
         </button>
@@ -111,7 +111,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
               className="relative h-9 w-9 rounded-full p-0"
               aria-label="User menu"
             >
-              <Avatar className="h-8 w-8 border border-black/[0.06] dark:border-white/[0.08]">
+              <Avatar className="h-8 w-8 border border-border/80 dark:border-white/[0.08]">
                 <AvatarFallback className="bg-secondary text-xs font-semibold">
                   {initials(user?.name)}
                 </AvatarFallback>

@@ -13,10 +13,10 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-destructive-foreground shadow-soft hover:bg-destructive/90",
         outline:
-          "border border-black/[0.08] bg-card text-foreground shadow-sm hover:bg-secondary dark:border-white/[0.1]",
+          "border border-border bg-card text-foreground shadow-sm hover:bg-secondary dark:border-white/[0.1]",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-black/[0.05] hover:text-foreground dark:hover:bg-white/[0.06]",
+        ghost: "hover:bg-foreground/[0.06] hover:text-foreground dark:hover:bg-white/[0.06]",
         link: "text-info underline-offset-4 hover:underline",
         ember:
           "bg-ember text-ember-foreground shadow-soft hover:bg-ember/92 hover:shadow-glow",

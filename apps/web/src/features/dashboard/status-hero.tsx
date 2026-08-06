@@ -21,8 +21,8 @@ export function StatusHero() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "overflow-hidden rounded-[1.5rem] border border-black/[0.04] bg-card shadow-elevated dark:border-white/[0.06]",
-        isAlarm && "border-ember/30 shadow-glow"
+        "overflow-hidden rounded-[1.5rem] border border-border/80 bg-card/95 shadow-elevated backdrop-blur-[2px] dark:border-white/[0.06] dark:bg-card",
+        isAlarm && "border-ember/35 shadow-glow"
       )}
       aria-label="System status overview"
     >
@@ -30,8 +30,8 @@ export function StatusHero() {
         className={cn(
           "px-6 py-5 sm:px-8 sm:py-6",
           isAlarm
-            ? "bg-gradient-to-br from-ember/[0.08] via-card to-card"
-            : "bg-gradient-to-br from-success/[0.07] via-card to-card"
+            ? "bg-gradient-to-br from-ember/[0.1] via-card to-surface-elevated"
+            : "bg-gradient-to-br from-success/[0.08] via-card to-surface-elevated"
         )}
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -54,8 +54,8 @@ export function StatusHero() {
         </div>
       </div>
 
-      <div className="grid gap-px bg-black/[0.04] dark:bg-white/[0.06] sm:grid-cols-3">
-        <div className="flex flex-col gap-3.5 bg-card px-6 py-5 sm:px-7 sm:py-6">
+      <div className="grid gap-px bg-border/70 dark:bg-white/[0.06] sm:grid-cols-3">
+        <div className="flex flex-col gap-3.5 bg-surface-elevated/90 px-6 py-5 sm:px-7 sm:py-6 dark:bg-card">
           <div className="flex items-center justify-between">
             <span className="metric-label">Fire</span>
             <Flame
@@ -73,7 +73,7 @@ export function StatusHero() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-3.5 bg-card px-6 py-5 sm:px-7 sm:py-6">
+        <div className="flex flex-col gap-3.5 bg-surface-elevated/90 px-6 py-5 sm:px-7 sm:py-6 dark:bg-card">
           <div className="flex items-center justify-between">
             <span className="metric-label">Device</span>
             <Radio className="h-4 w-4 text-muted-foreground" />
@@ -84,7 +84,7 @@ export function StatusHero() {
           <ConnectionBadge status={connectionStatus} />
         </div>
 
-        <div className="flex flex-col gap-3.5 bg-card px-6 py-5 sm:px-7 sm:py-6">
+        <div className="flex flex-col gap-3.5 bg-surface-elevated/90 px-6 py-5 sm:px-7 sm:py-6 dark:bg-card">
           <div className="flex items-center justify-between">
             <span className="metric-label">Smoke</span>
             <Wind className="h-4 w-4 text-muted-foreground" />

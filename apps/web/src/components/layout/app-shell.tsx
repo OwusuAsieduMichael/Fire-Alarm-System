@@ -16,7 +16,7 @@ export function AppShell({ children }: AppShellProps) {
   const [commandOpen, setCommandOpen] = React.useState(false);
 
   return (
-    <div className="flex min-h-dvh w-full bg-background">
+    <div className="flex min-h-dvh w-full bg-surface dark:bg-background">
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-20 lg:flex lg:w-[248px] lg:flex-col">
         <Sidebar />
       </div>

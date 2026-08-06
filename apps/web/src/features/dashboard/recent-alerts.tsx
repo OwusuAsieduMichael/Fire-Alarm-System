@@ -34,7 +34,7 @@ function AlertItem({ alert }: { alert: Alert }) {
       exit={{ opacity: 0, y: -8 }}
       transition={{ type: "spring", stiffness: 320, damping: 28 }}
       className={cn(
-        "rounded-[1.1rem] border border-black/[0.04] bg-secondary/40 p-3.5 transition-colors hover:bg-secondary/70 dark:border-white/[0.06]",
+        "rounded-[1.1rem] border border-border/65 bg-surface/70 p-3.5 transition-colors hover:bg-surface dark:border-white/[0.06] dark:bg-secondary/40 dark:hover:bg-secondary/70",
         !alert.acknowledged && "border-l-[3px] border-l-ember"
       )}
     >

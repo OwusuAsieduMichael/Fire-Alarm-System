@@ -76,14 +76,14 @@ function NavLink({
         "relative flex items-center gap-2.5 rounded-[12px] px-3 py-[9px] text-[13px] font-medium transition-colors duration-200",
         active
           ? "text-foreground"
-          : "text-muted-foreground hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/[0.05]"
+          : "text-muted-foreground hover:bg-foreground/[0.05] hover:text-foreground"
       )}
       aria-current={active ? "page" : undefined}
     >
       {active ? (
         <motion.span
           layoutId="sidebar-active"
-          className="absolute inset-0 rounded-[12px] bg-white shadow-soft dark:bg-white/[0.08]"
+          className="absolute inset-0 rounded-[12px] border border-border/80 bg-card shadow-soft dark:border-white/[0.08] dark:bg-white/[0.08]"
           transition={{ type: "spring", stiffness: 440, damping: 36 }}
         />
       ) : null}
@@ -111,7 +111,7 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full w-[248px] flex-col border-r border-black/[0.05] bg-[#F2F2F7]/90 backdrop-blur-2xl dark:border-white/[0.06] dark:bg-[#0B0B0F]/80",
+        "flex h-full w-[248px] flex-col border-r border-border/70 bg-surface/92 backdrop-blur-2xl dark:border-white/[0.06] dark:bg-[#0B0B0F]/80",
         className
       )}
     >
@@ -171,8 +171,8 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
         </nav>
       </ScrollArea>
 
-      <div className="border-t border-black/[0.05] p-3 dark:border-white/[0.06]">
-        <div className="rounded-[12px] bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]">
+      <div className="border-t border-border/70 p-3 dark:border-white/[0.06]">
+        <div className="rounded-[12px] border border-border/50 bg-card/70 px-3 py-2.5 dark:border-transparent dark:bg-white/[0.04]">
           <p className="truncate text-[13px] font-medium tracking-tight">
             {user?.name ?? "Operator"}
           </p>
