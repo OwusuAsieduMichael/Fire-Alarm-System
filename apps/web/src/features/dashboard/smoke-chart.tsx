@@ -7,6 +7,7 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -39,38 +40,50 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15, duration: 0.4 }}
+      transition={{ delay: 0.12, duration: 0.4 }}
     >
-      <Card className="h-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <Card className="h-full border-border/55">
+        <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
           <div>
-            <CardTitle className="text-base">Smoke History</CardTitle>
+            <p className="metric-label">Trend</p>
+            <CardTitle className="mt-1.5 text-lg">Smoke history</CardTitle>
             <p className="mt-1 text-xs text-muted-foreground">
               Live readings · threshold {threshold} ppm
             </p>
           </div>
         </CardHeader>
-        <CardContent className="h-[280px] pt-2">
+        <CardContent className="h-[300px] pt-2">
           {loading ? (
-            <Skeleton className="h-full w-full" />
+            <Skeleton className="h-full w-full rounded-2xl" />
           ) : data.length === 0 ? (
             <EmptyState
               icon={<Activity className="h-5 w-5" />}
               title="Waiting for sensor data"
-              description="Smoke history will appear once the ESP32 starts streaming readings."
+              description="Smoke history appears once the ESP32 starts streaming."
               className="h-full border-0 bg-transparent py-8"
             />
           ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <AreaChart
+                data={data}
+                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+              >
                 <defs>
                   <linearGradient id="smokeFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="hsl(347 77% 50%)" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="hsl(347 77% 50%)" stopOpacity={0} />
+                    <stop
+                      offset="0%"
+                      stopColor="hsl(348 78% 44%)"
+                      stopOpacity={0.28}
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="hsl(348 78% 44%)"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
-                  strokeDasharray="3 3"
+                  strokeDasharray="4 8"
                   stroke="hsl(var(--border))"
                   vertical={false}
                 />
@@ -79,7 +92,7 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
                   tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
-                  minTickGap={28}
+                  minTickGap={32}
                 />
                 <YAxis
                   tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
@@ -87,12 +100,19 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
                   tickLine={false}
                   width={40}
                 />
+                <ReferenceLine
+                  y={threshold}
+                  stroke="hsl(var(--warning))"
+                  strokeDasharray="4 4"
+                  strokeOpacity={0.7}
+                />
                 <Tooltip
                   contentStyle={{
                     background: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
-                    borderRadius: 12,
+                    borderRadius: 14,
                     boxShadow: "var(--shadow-elevated)",
+                    fontSize: 12,
                   }}
                   labelStyle={{ color: "hsl(var(--muted-foreground))" }}
                   formatter={(value) => {
@@ -106,11 +126,11 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
                 <Area
                   type="monotone"
                   dataKey="smokeLevel"
-                  stroke="hsl(347 77% 50%)"
-                  strokeWidth={2}
+                  stroke="hsl(348 78% 44%)"
+                  strokeWidth={2.25}
                   fill="url(#smokeFill)"
                   isAnimationActive
-                  animationDuration={600}
+                  animationDuration={500}
                 />
               </AreaChart>
             </ResponsiveContainer>

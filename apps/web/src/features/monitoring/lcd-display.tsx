@@ -15,9 +15,10 @@ export function LcdDisplay() {
   const line2 = padLine(live.lcdMessage || `Smoke:${Math.round(live.smokeLevel)}`);
 
   return (
-    <Card>
+    <Card className="border-border/55">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">LCD Simulation</CardTitle>
+        <p className="metric-label">Hardware</p>
+        <CardTitle className="mt-1.5 text-lg">LCD simulation</CardTitle>
         <p className="text-xs text-muted-foreground">16×2 character display</p>
       </CardHeader>
       <CardContent>

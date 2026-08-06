@@ -17,8 +17,9 @@ export default function MonitoringPage() {
   useSensorHistory(selected?.id, 80);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Live view"
         title="Monitoring"
         description="LCD simulation, actuator status, and deep sensor telemetry."
         actions={<ConnectionBadge />}

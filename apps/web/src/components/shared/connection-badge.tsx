@@ -44,7 +44,7 @@ export function ConnectionBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border text-xs font-semibold",
+        "inline-flex items-center gap-2 rounded-full border text-[11px] font-semibold tracking-wide",
         compact ? "px-2.5 py-0.5" : "px-3 py-1",
         styles[resolved],
         className

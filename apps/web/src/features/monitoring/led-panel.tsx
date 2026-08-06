@@ -53,9 +53,10 @@ export function LedPanel() {
   const active = normalizeLed(ledStatus);
 
   return (
-    <Card>
+    <Card className="border-border/55">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">LED Status</CardTitle>
+        <p className="metric-label">Indicator</p>
+        <CardTitle className="mt-1.5 text-lg">LED status</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-3 gap-3">
@@ -65,7 +66,10 @@ export function LedPanel() {
             return (
               <div
                 key={color}
-                className="flex flex-col items-center gap-2 rounded-2xl border border-border/70 bg-surface-elevated/50 p-4"
+                className={cn(
+                  "flex flex-col items-center gap-2.5 rounded-2xl border border-border/55 bg-surface-elevated/50 p-4 transition-colors",
+                  on && "bg-muted/40"
+                )}
               >
                 <motion.div
                   className={cn(
@@ -91,7 +95,7 @@ export function LedPanel() {
             );
           })}
         </div>
-        <p className="mt-4 text-center text-sm font-medium">
+        <p className="mt-4 text-center text-sm font-semibold tracking-tight">
           {ledMeta[active].label}
         </p>
       </CardContent>

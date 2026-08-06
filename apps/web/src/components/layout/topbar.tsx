@@ -46,7 +46,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
     "FireGuard";
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/50 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
       <Button
         variant="ghost"
         size="icon"
@@ -63,23 +63,22 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
         </h1>
       </div>
 
-      {/* Centered search — quiet, Shopify-like */}
       <div className="mx-auto hidden w-full max-w-md flex-1 md:block lg:absolute lg:left-1/2 lg:max-w-lg lg:-translate-x-1/2">
         <button
           type="button"
           onClick={onSearchClick}
-          className="flex h-9 w-full items-center gap-2 rounded-xl border border-border/70 bg-muted/50 px-3 text-left text-sm text-muted-foreground transition-colors hover:bg-muted"
+          className="flex h-9 w-full items-center gap-2 rounded-xl border border-border/60 bg-card/80 px-3 text-left text-sm text-muted-foreground shadow-sm transition-colors hover:bg-muted/60"
           aria-label="Open command palette"
         >
           <Search className="h-3.5 w-3.5 shrink-0" />
-          <span className="flex-1 truncate">Search</span>
-          <kbd className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+          <span className="flex-1 truncate">Search pages and actions…</span>
+          <kbd className="rounded-md border border-border/70 bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
             ⌘K
           </kbd>
         </button>
       </div>
 
-      <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+      <div className="ml-auto flex items-center gap-1.5">
         <div className="hidden sm:block">
           <ConnectionBadge compact />
         </div>
@@ -111,14 +110,14 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
               className="relative h-9 w-9 rounded-full p-0"
               aria-label="User menu"
             >
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="text-xs">
+              <Avatar className="h-8 w-8 border border-border/60">
+                <AvatarFallback className="bg-muted text-xs font-semibold">
                   {initials(user?.name)}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium">{user?.name ?? "User"}</p>

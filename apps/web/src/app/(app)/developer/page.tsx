@@ -30,8 +30,12 @@ export default function DeveloperPage() {
 
   if (role !== "DEVELOPER") {
     return (
-      <div>
-        <PageHeader title="Developer" description="Restricted area." />
+      <div className="space-y-7">
+        <PageHeader
+          eyebrow="Restricted"
+          title="Developer"
+          description="Developer tools require elevated access."
+        />
         <EmptyState
           icon={<Terminal className="h-5 w-5" />}
           title="Access restricted"
@@ -42,9 +46,10 @@ export default function DeveloperPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <PageHeader
-        title="Developer Panel"
+        eyebrow="Engineering"
+        title="Developer panel"
         description="ESP32 diagnostics, debug console, and connection logs."
       />
       <DiagnosticsPanel device={selected} />

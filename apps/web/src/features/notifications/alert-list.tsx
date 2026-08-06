@@ -18,9 +18,9 @@ interface AlertListProps {
 }
 
 const severityStyles: Record<AlertSeverity, string> = {
-  CRITICAL: "border-l-ember bg-ember/5",
-  WARNING: "border-l-warning bg-warning/5",
-  INFO: "border-l-muted-foreground/40 bg-card",
+  CRITICAL: "border-l-ember bg-ember/[0.04]",
+  WARNING: "border-l-warning bg-warning/[0.04]",
+  INFO: "border-l-info/70 bg-card",
 };
 
 const smsLabel: Record<SmsStatus, string> = {
@@ -40,7 +40,7 @@ export function AlertList({
     return (
       <div className="space-y-3">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-28 w-full" />
+          <Skeleton key={i} className="h-28 w-full rounded-[1.25rem]" />
         ))}
       </div>
     );
@@ -63,8 +63,8 @@ export function AlertList({
           <motion.li
             key={alert.id}
             layout
-            initial={{ opacity: 0, x: 28 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0 }}
             transition={{
               type: "spring",
@@ -73,15 +73,15 @@ export function AlertList({
               delay: Math.min(index * 0.03, 0.2),
             }}
             className={cn(
-              "rounded-2xl border border-border/70 border-l-4 p-4 shadow-soft",
+              "rounded-[1.25rem] border border-border/55 border-l-[3px] p-4 shadow-soft transition-shadow hover:shadow-elevated sm:p-5",
               severityStyles[alert.severity],
-              alert.acknowledged && "opacity-70"
+              alert.acknowledged && "opacity-65"
             )}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-sm font-semibold sm:text-base">
+                  <h3 className="text-sm font-semibold tracking-tight sm:text-base">
                     {alert.title}
                   </h3>
                   <Badge
@@ -90,7 +90,7 @@ export function AlertList({
                         ? "ember"
                         : alert.severity === "WARNING"
                           ? "warning"
-                          : "secondary"
+                          : "info"
                     }
                   >
                     {alert.severity}
@@ -112,7 +112,9 @@ export function AlertList({
                     </Badge>
                   ) : null}
                 </div>
-                <p className="text-sm text-muted-foreground">{alert.message}</p>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {alert.message}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {format(new Date(alert.createdAt), "MMM d, yyyy · HH:mm:ss")}{" "}
                   ·{" "}

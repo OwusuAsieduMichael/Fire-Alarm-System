@@ -6,6 +6,7 @@ interface PageHeaderProps {
   description?: string;
   actions?: ReactNode;
   className?: string;
+  eyebrow?: string;
 }
 
 export function PageHeader({
@@ -13,20 +14,24 @@ export function PageHeader({
   description,
   actions,
   className,
+  eyebrow,
 }: PageHeaderProps) {
   return (
     <div
       className={cn(
-        "mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between",
+        "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
         className
       )}
     >
-      <div className="space-y-1">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+      <div className="space-y-1.5">
+        {eyebrow ? <p className="metric-label">{eyebrow}</p> : null}
+        <h1 className="text-[1.65rem] font-semibold tracking-tight text-foreground sm:text-[1.85rem]">
           {title}
         </h1>
         {description ? (
-          <p className="max-w-xl text-sm text-muted-foreground">{description}</p>
+          <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+            {description}
+          </p>
         ) : null}
       </div>
       {actions ? (

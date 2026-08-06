@@ -19,8 +19,9 @@ export default function SettingsPage() {
   const updateDevice = useUpdateDeviceSettings();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Configuration"
         title="Settings"
         description="Thresholds, calibration, theme, and system configuration."
       />
@@ -39,14 +40,15 @@ export default function SettingsPage() {
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="border-border/55">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">WiFi Status</CardTitle>
+            <p className="metric-label">Network</p>
+            <CardTitle className="mt-1.5 text-lg">Wi‑Fi status</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="space-y-1 text-sm">
             <Row label="SSID" value={selected?.wifiSsid ?? "—"} />
-            <Row label="IP Address" value={selected?.ipAddress ?? "—"} />
-            <div className="flex items-center justify-between gap-3">
+            <Row label="IP Address" value={selected?.ipAddress ?? "—"} mono />
+            <div className="flex items-center justify-between gap-3 rounded-xl px-2 py-2.5">
               <span className="text-muted-foreground">Link</span>
               <StatusPill
                 label={live.status}
@@ -57,14 +59,19 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-border/55">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">System Configuration</CardTitle>
+            <p className="metric-label">System</p>
+            <CardTitle className="mt-1.5 text-lg">Configuration</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="space-y-1 text-sm">
             <Row label="Device" value={selected?.name ?? "—"} />
-            <Row label="Firmware" value={selected?.firmwareVersion ?? "—"} />
-            <Row label="Device key" value={selected?.deviceKey ?? "—"} />
+            <Row
+              label="Firmware"
+              value={selected?.firmwareVersion ?? "—"}
+              mono
+            />
+            <Row label="Device key" value={selected?.deviceKey ?? "—"} mono />
             <Row
               label="Write access"
               value={canWrite ? "Developer" : "Read-only"}
@@ -76,11 +83,21 @@ export default function SettingsPage() {
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex items-center justify-between gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-muted/40">
       <span className="text-muted-foreground">{label}</span>
-      <span className="truncate font-medium font-mono text-xs sm:text-sm">
+      <span
+        className={`truncate font-medium ${mono ? "font-mono text-xs sm:text-sm" : ""}`}
+      >
         {value}
       </span>
     </div>

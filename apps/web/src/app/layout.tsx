@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import { AppProviders } from "@/providers/app-providers";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-sans",
   display: "swap",
 });
 
@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${dmSans.variable} ${jetbrains.variable} font-sans`}>
+      <body className={`${plusJakarta.variable} ${jetbrains.variable} font-sans`}>
         <AppProviders>
           {children}
           <Toaster
@@ -41,7 +41,8 @@ export default function RootLayout({
             richColors
             closeButton
             toastOptions={{
-              className: "rounded-2xl border border-border/80 shadow-elevated",
+              className:
+                "rounded-2xl border border-border/70 bg-card/95 shadow-elevated backdrop-blur-xl",
             }}
           />
         </AppProviders>

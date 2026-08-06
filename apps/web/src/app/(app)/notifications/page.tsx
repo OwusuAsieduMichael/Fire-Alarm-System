@@ -34,8 +34,9 @@ export default function NotificationsPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Inbox"
         title="Notifications"
         description="Fire, smoke, and SMS alert history with one-tap acknowledgement."
         actions={
@@ -50,10 +51,7 @@ export default function NotificationsPage() {
         }
       />
 
-      <Tabs
-        value={filter}
-        onValueChange={(v) => setFilter(v as AlertFilter)}
-      >
+      <Tabs value={filter} onValueChange={(v) => setFilter(v as AlertFilter)}>
         <TabsList>
           <TabsTrigger value="ALL">All</TabsTrigger>
           <TabsTrigger value="FIRE">Fire</TabsTrigger>

@@ -11,9 +11,10 @@ export function BuzzerVisual() {
   const active = useDeviceStore((s) => s.live.buzzerActive);
 
   return (
-    <Card>
+    <Card className="border-border/55">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Buzzer Status</CardTitle>
+        <p className="metric-label">Actuator</p>
+        <CardTitle className="mt-1.5 text-lg">Buzzer</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-5 py-4">
         <StatusPill
@@ -40,10 +41,10 @@ export function BuzzerVisual() {
             : null}
           <div
             className={cn(
-              "relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl border",
+              "relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl border transition-colors",
               active
                 ? "border-ember/40 bg-ember/15 text-ember"
-                : "border-border bg-muted text-muted-foreground"
+                : "border-border/70 bg-muted/80 text-muted-foreground"
             )}
           >
             {active ? (
@@ -53,7 +54,7 @@ export function BuzzerVisual() {
             )}
           </div>
         </div>
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground">
           {active
             ? "Audible alarm waveform is broadcasting"
             : "Buzzer is silent and ready"}

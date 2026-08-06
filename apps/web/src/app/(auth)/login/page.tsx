@@ -147,14 +147,14 @@ export default function LoginPage() {
         </motion.div>
       </form>
 
-      <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground">Try a demo</p>
+      <div className="space-y-2.5">
+        <p className="metric-label">Demo access</p>
         <div className="flex flex-wrap gap-2">
           {DEMO_HINTS.map((hint) => (
             <button
               key={hint.email}
               type="button"
-              className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
+              className="rounded-full border border-border/70 bg-muted/40 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-border hover:bg-muted hover:shadow-soft"
               onClick={() => {
                 setEmail(hint.email);
                 setPassword("FireGuard@2026");
@@ -164,6 +164,9 @@ export default function LoginPage() {
             </button>
           ))}
         </div>
+        <p className="text-[11px] text-muted-foreground">
+          Password: FireGuard@2026
+        </p>
       </div>
     </div>
   );

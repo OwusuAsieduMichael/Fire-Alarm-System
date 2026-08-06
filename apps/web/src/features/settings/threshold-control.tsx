@@ -46,10 +46,13 @@ export function ThresholdControl({
   return (
     <TooltipProvider>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="border-border/55">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-2">
-              <CardTitle className="text-base">Smoke Threshold</CardTitle>
+              <div>
+                <p className="metric-label">Detection</p>
+                <CardTitle className="mt-1.5 text-lg">Smoke threshold</CardTitle>
+              </div>
               {!canWrite ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -71,7 +74,7 @@ export function ThresholdControl({
           <CardContent className="space-y-5">
             <div className="flex items-end justify-between">
               <Label htmlFor="smoke-threshold">Threshold</Label>
-              <span className="sensor-value text-2xl font-semibold">
+              <span className="sensor-value text-2xl font-semibold tracking-tight">
                 {threshold}
                 <span className="ml-1 text-sm font-medium text-muted-foreground">
                   ppm
@@ -92,13 +95,29 @@ export function ThresholdControl({
               <span>Sensitive</span>
               <span>Relaxed</span>
             </div>
+            {canWrite ? (
+              <Button
+                disabled={!dirty || loading}
+                onClick={() =>
+                  onSave({
+                    smokeThreshold: threshold,
+                    smokeCalibration: calibration,
+                  })
+                }
+              >
+                {loading ? "Saving…" : "Save threshold"}
+              </Button>
+            ) : null}
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-border/55">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-2">
-              <CardTitle className="text-base">Sensor Calibration</CardTitle>
+              <div>
+                <p className="metric-label">Sensor</p>
+                <CardTitle className="mt-1.5 text-lg">Calibration</CardTitle>
+              </div>
               {!canWrite ? (
                 <Tooltip>
                   <TooltipTrigger asChild>

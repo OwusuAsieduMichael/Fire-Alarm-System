@@ -22,18 +22,24 @@ export default function ProfilePage() {
   }, [user?.name, user?.phone]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Account"
         title="Profile"
         description="Manage your FireGuard operator identity."
       />
 
-      <Card className="max-w-xl">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-          <CardTitle>{user?.name ?? "Operator"}</CardTitle>
+      <Card className="max-w-xl border-border/55">
+        <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
+          <div>
+            <p className="metric-label">Operator</p>
+            <CardTitle className="mt-1.5 text-lg">
+              {user?.name ?? "Operator"}
+            </CardTitle>
+          </div>
           <Badge variant="secondary">{user?.role ?? "USER"}</Badge>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" value={user?.email ?? ""} disabled />
@@ -44,6 +50,7 @@ export default function ProfilePage() {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
             />
           </div>
           <div className="space-y-2">
@@ -55,7 +62,7 @@ export default function ProfilePage() {
               placeholder="+1 555 0100"
             />
           </div>
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex flex-wrap gap-2 pt-1">
             <Button
               disabled={updateProfile.isPending}
               onClick={() =>
@@ -65,7 +72,7 @@ export default function ProfilePage() {
                 })
               }
             >
-              Save changes
+              {updateProfile.isPending ? "Saving…" : "Save changes"}
             </Button>
             <Button variant="outline" onClick={logout}>
               Sign out

@@ -34,26 +34,30 @@ interface ControlActionCardProps {
 
 const toneStyles: Record<
   ActionTone,
-  { card: string; icon: string; button: "ember" | "destructive" | "secondary" | "outline" }
+  {
+    card: string;
+    icon: string;
+    button: "ember" | "destructive" | "secondary" | "outline";
+  }
 > = {
   danger: {
-    card: "border-ember/30 hover:border-ember/50",
-    icon: "bg-ember/15 text-ember",
+    card: "border-ember/25 hover:border-ember/40 hover:shadow-glow",
+    icon: "bg-ember/12 text-ember",
     button: "ember",
   },
   warning: {
-    card: "border-warning/30 hover:border-warning/50",
-    icon: "bg-warning/15 text-warning",
+    card: "border-warning/25 hover:border-warning/40",
+    icon: "bg-warning/12 text-warning",
     button: "destructive",
   },
   calm: {
-    card: "border-success/25 hover:border-success/40",
-    icon: "bg-success/15 text-success",
+    card: "border-success/20 hover:border-success/35",
+    icon: "bg-success/12 text-success",
     button: "secondary",
   },
   neutral: {
-    card: "border-border/80 hover:border-border",
-    icon: "bg-muted text-muted-foreground",
+    card: "border-border/55 hover:border-border",
+    icon: "bg-muted/80 text-muted-foreground",
     button: "outline",
   },
 };
@@ -84,9 +88,14 @@ export function ControlActionCard({
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.06, duration: 0.35 }}
+        transition={{ delay: index * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Card className={cn("h-full transition-all", styles.card)}>
+        <Card
+          className={cn(
+            "h-full border-border/55 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated",
+            styles.card
+          )}
+        >
           <CardContent className="flex h-full flex-col gap-5 p-6">
             <div
               className={cn(
@@ -98,7 +107,9 @@ export function ControlActionCard({
             </div>
             <div className="flex-1 space-y-1.5">
               <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
-              <p className="text-sm text-muted-foreground">{description}</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {description}
+              </p>
             </div>
             <motion.div whileTap={{ scale: 0.98 }}>
               <Button
@@ -124,7 +135,7 @@ export function ControlActionCard({
       </motion.div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-[1.35rem] sm:rounded-[1.35rem]">
           <DialogHeader>
             <DialogTitle>{confirmTitle ?? `Confirm ${title}`}</DialogTitle>
             <DialogDescription>
