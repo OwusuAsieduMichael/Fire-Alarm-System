@@ -27,7 +27,7 @@ export interface SidebarNavItem {
 }
 
 export const SIDEBAR_NAV: SidebarNavItem[] = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { title: "Home", href: "/dashboard", icon: LayoutDashboard },
   { title: "Monitoring", href: "/monitoring", icon: Gauge },
   { title: "Controls", href: "/controls", icon: SlidersHorizontal },
   { title: "Notifications", href: "/notifications", icon: Bell },
@@ -57,28 +57,25 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full w-64 flex-col border-r border-border/80 bg-card/60 backdrop-blur-xl",
+        "flex h-full w-[240px] flex-col border-r border-border/60 bg-[#f7f7f8] dark:bg-card/40",
         className
       )}
     >
-      <div className="flex items-center gap-3 px-5 py-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ember text-ember-foreground shadow-glow">
-          <Flame className="h-5 w-5" aria-hidden="true" />
+      <div className="flex items-center gap-2.5 px-4 py-4">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-ember text-ember-foreground">
+          <Flame className="h-4 w-4" aria-hidden="true" />
         </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold tracking-tight">
-            FireGuard
-          </p>
-          <p className="truncate text-xs text-muted-foreground">IoT Platform</p>
-        </div>
+        <p className="truncate text-sm font-semibold tracking-tight">
+          FireGuard
+        </p>
       </div>
 
-      <div className="px-4 pb-3">
+      <div className="px-3 pb-3">
         <ConnectionBadge className="w-full justify-center" />
       </div>
 
-      <ScrollArea className="flex-1 px-3 pb-4">
-        <nav aria-label="Main" className="space-y-1">
+      <ScrollArea className="flex-1 px-2.5 pb-4">
+        <nav aria-label="Main" className="space-y-0.5">
           {items.map((item) => {
             const active =
               pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -89,18 +86,18 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
                 href={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  "relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors",
+                  "relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-medium transition-colors",
                   active
                     ? "text-foreground"
-                    : "text-muted-foreground hover:bg-accent/70 hover:text-foreground"
+                    : "text-muted-foreground hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/[0.05]"
                 )}
                 aria-current={active ? "page" : undefined}
               >
                 {active ? (
                   <motion.span
                     layoutId="sidebar-active"
-                    className="absolute inset-0 rounded-2xl bg-secondary shadow-soft"
-                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                    className="absolute inset-0 rounded-xl bg-white shadow-soft dark:bg-secondary"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
                   />
                 ) : null}
                 <Icon className="relative z-10 h-4 w-4 shrink-0" />
@@ -111,12 +108,12 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
         </nav>
       </ScrollArea>
 
-      <div className="border-t border-border/80 p-4">
-        <div className="rounded-2xl bg-muted/60 px-3 py-3">
-          <p className="truncate text-sm font-medium">
+      <div className="border-t border-border/60 p-3">
+        <div className="px-2 py-1.5">
+          <p className="truncate text-[13px] font-medium">
             {user?.name ?? "Operator"}
           </p>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="truncate text-[11px] text-muted-foreground">
             {user?.role ?? "VIEWER"}
           </p>
         </div>

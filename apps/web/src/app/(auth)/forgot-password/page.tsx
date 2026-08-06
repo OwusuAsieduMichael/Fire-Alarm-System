@@ -58,10 +58,10 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">Reset password</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">Reset password</h1>
+        <p className="text-sm text-muted-foreground">
           Enter your email and we&apos;ll send recovery instructions.
         </p>
       </div>
@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
             ) : null}
           </div>
 
-          <motion.div whileTap={{ scale: 0.98 }} whileHover={{ scale: 1.01 }}>
+          <motion.div whileTap={{ scale: 0.985 }}>
             <Button type="submit" className="w-full" size="lg" disabled={loading}>
               {loading ? (
                 <>

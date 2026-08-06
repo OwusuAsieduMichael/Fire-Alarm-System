@@ -4,55 +4,55 @@
 
 @layer base {
   :root {
-    --background: 210 20% 97%;
-    --foreground: 215 28% 12%;
+    --background: 220 14% 97%;
+    --foreground: 220 18% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 28% 12%;
+    --card-foreground: 220 18% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 28% 12%;
+    --popover-foreground: 220 18% 12%;
 
-    --primary: 347 77% 50%;
+    --primary: 347 72% 46%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 16% 93%;
-    --secondary-foreground: 215 25% 20%;
+    --secondary: 220 12% 94%;
+    --secondary-foreground: 220 16% 22%;
 
-    --muted: 210 14% 94%;
-    --muted-foreground: 215 12% 45%;
+    --muted: 220 12% 95%;
+    --muted-foreground: 220 10% 42%;
 
-    --accent: 210 16% 93%;
-    --accent-foreground: 215 25% 18%;
+    --accent: 220 12% 94%;
+    --accent-foreground: 220 16% 18%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --ember: 347 77% 50%;
+    --ember: 347 72% 46%;
     --ember-foreground: 0 0% 100%;
-    --ember-muted: 347 60% 94%;
+    --ember-muted: 347 55% 95%;
 
-    --success: 152 60% 36%;
+    --success: 152 55% 34%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 36 90% 48%;
     --warning-foreground: 30 80% 12%;
 
-    --surface: 210 20% 98%;
+    --surface: 220 14% 98%;
     --surface-elevated: 0 0% 100%;
 
-    --border: 214 18% 88%;
-    --input: 214 18% 88%;
-    --ring: 347 77% 50%;
+    --border: 220 12% 90%;
+    --input: 220 12% 88%;
+    --ring: 347 72% 46%;
 
-    --radius: 1.125rem;
+    --radius: 0.875rem;
 
-    --shadow-soft: 0 1px 2px hsl(215 28% 12% / 0.04),
-      0 8px 24px hsl(215 28% 12% / 0.06);
-    --shadow-elevated: 0 4px 12px hsl(215 28% 12% / 0.06),
-      0 20px 40px hsl(215 28% 12% / 0.08);
-    --shadow-glow: 0 0 0 1px hsl(347 77% 50% / 0.12),
-      0 8px 28px hsl(347 77% 50% / 0.18);
+    --shadow-soft: 0 1px 2px hsl(220 18% 12% / 0.04),
+      0 4px 16px hsl(220 18% 12% / 0.04);
+    --shadow-elevated: 0 2px 8px hsl(220 18% 12% / 0.05),
+      0 16px 40px hsl(220 18% 12% / 0.07);
+    --shadow-glow: 0 0 0 1px hsl(347 72% 46% / 0.1),
+      0 8px 24px hsl(347 72% 46% / 0.14);
   }
 
   .dark {
@@ -116,30 +116,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    background-image: radial-gradient(
-        ellipse 80% 50% at 20% -10%,
-        hsl(347 77% 50% / 0.06),
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse 60% 40% at 95% 0%,
-        hsl(210 30% 50% / 0.05),
-        transparent 50%
-      );
     min-height: 100dvh;
-  }
-
-  .dark body {
-    background-image: radial-gradient(
-        ellipse 80% 50% at 15% -5%,
-        hsl(347 70% 40% / 0.1),
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse 50% 40% at 95% 5%,
-        hsl(200 25% 30% / 0.08),
-        transparent 50%
-      );
   }
 
   :focus-visible {
@@ -157,7 +134,36 @@
   }
 
   .surface-panel {
-    @apply rounded-2xl border border-border/80 bg-card shadow-soft;
+    @apply rounded-2xl border border-border/70 bg-card shadow-soft;
+  }
+
+  .workspace-canvas {
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(
+        ellipse 70% 45% at 15% 0%,
+        hsl(347 60% 50% / 0.045),
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 55% 40% at 90% 10%,
+        hsl(200 35% 55% / 0.04),
+        transparent 50%
+      );
+  }
+
+  .dark .workspace-canvas {
+    background-image:
+      radial-gradient(
+        ellipse 70% 45% at 15% 0%,
+        hsl(347 55% 40% / 0.08),
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 55% 40% at 90% 10%,
+        hsl(200 25% 35% / 0.06),
+        transparent 50%
+      );
   }
 
   .live-dot {
@@ -207,42 +213,22 @@
   }
 
   .auth-atmosphere {
-    background-color: hsl(var(--background));
+    background-color: hsl(220 14% 12%);
     background-image:
       radial-gradient(
-        ellipse 90% 60% at 50% -20%,
-        hsl(347 77% 45% / 0.18),
+        ellipse 80% 60% at 20% 20%,
+        hsl(347 55% 28% / 0.45),
         transparent 55%
       ),
       radial-gradient(
-        ellipse 50% 40% at 0% 80%,
-        hsl(210 30% 40% / 0.1),
+        ellipse 70% 50% at 85% 75%,
+        hsl(200 25% 22% / 0.4),
         transparent 50%
-      ),
-      radial-gradient(
-        ellipse 40% 30% at 100% 90%,
-        hsl(215 20% 30% / 0.08),
-        transparent 45%
       );
   }
 
   .dark .auth-atmosphere {
-    background-image:
-      radial-gradient(
-        ellipse 90% 60% at 50% -15%,
-        hsl(347 70% 40% / 0.28),
-        transparent 55%
-      ),
-      radial-gradient(
-        ellipse 50% 40% at 0% 85%,
-        hsl(210 25% 25% / 0.2),
-        transparent 50%
-      ),
-      radial-gradient(
-        ellipse 40% 30% at 100% 95%,
-        hsl(200 20% 20% / 0.15),
-        transparent 45%
-      );
+    background-color: hsl(220 18% 6%);
   }
 }
 

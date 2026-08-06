@@ -1,6 +1,6 @@
 "use client";
 
-import { Flame } from "lucide-react";
+import { Flame, ShieldCheck, Radio } from "lucide-react";
 import { motion } from "framer-motion";
 import { GuestGuard } from "@/components/auth/auth-guard";
 
@@ -11,44 +11,71 @@ export default function AuthLayout({
 }) {
   return (
     <GuestGuard>
-      <div className="auth-atmosphere relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "linear-gradient(to right, hsl(var(--border) / 0.35) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.35) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-            maskImage:
-              "radial-gradient(ellipse 70% 60% at 50% 40%, black, transparent)",
-          }}
-        />
-
+      <div className="auth-atmosphere flex min-h-dvh items-center justify-center p-4 sm:p-6 lg:p-8">
         <motion.div
-          className="relative z-10 w-full max-w-md"
-          initial={{ opacity: 0, y: 16 }}
+          className="relative z-10 grid w-full max-w-5xl overflow-hidden rounded-3xl border border-border/70 bg-card shadow-elevated lg:grid-cols-[1.05fr_0.95fr]"
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="mb-8 text-center">
-            <motion.div
-              className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-ember text-ember-foreground shadow-glow"
-              initial={{ scale: 0.85, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.05 }}
-            >
-              <Flame className="h-7 w-7" aria-hidden="true" />
-            </motion.div>
-            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              FireGuard IoT
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-              Industrial fire monitoring, refined for operators.
+          {/* Form column */}
+          <div className="flex flex-col px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
+            <div className="mb-10 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ember text-ember-foreground">
+                <Flame className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="text-base font-semibold tracking-tight">
+                  FireGuard
+                </p>
+                <p className="text-xs text-muted-foreground">IoT Platform</p>
+              </div>
+            </div>
+
+            <div className="mx-auto w-full max-w-sm flex-1">{children}</div>
+
+            <p className="mt-10 text-center text-[11px] text-muted-foreground">
+              Secure operator access · Live ESP32 monitoring
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-elevated backdrop-blur-xl sm:p-8">
-            {children}
+          {/* Visual column — calm brand panel, not marketing clutter */}
+          <div className="relative hidden overflow-hidden bg-foreground text-background lg:flex lg:flex-col lg:justify-between lg:p-10">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 opacity-90"
+              style={{
+                backgroundImage:
+                  "radial-gradient(ellipse 80% 70% at 20% 20%, hsl(347 70% 42% / 0.55), transparent 55%), radial-gradient(ellipse 70% 60% at 90% 80%, hsl(210 30% 28% / 0.5), transparent 50%)",
+              }}
+            />
+            <div className="relative">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-background/55">
+                Operations
+              </p>
+              <h2 className="mt-4 max-w-xs text-3xl font-semibold leading-tight tracking-tight text-balance">
+                Clear status. Fast response.
+              </h2>
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-background/65">
+                Monitor smoke, flame, and device health from one calm control
+                surface built for operators.
+              </p>
+            </div>
+
+            <div className="relative space-y-3">
+              <div className="flex items-center gap-3 rounded-2xl border border-background/10 bg-background/10 px-4 py-3 backdrop-blur-sm">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-background/80" />
+                <p className="text-sm text-background/75">
+                  Live SAFE / ALARM state at a glance
+                </p>
+              </div>
+              <div className="flex items-center gap-3 rounded-2xl border border-background/10 bg-background/10 px-4 py-3 backdrop-blur-sm">
+                <Radio className="h-4 w-4 shrink-0 text-background/80" />
+                <p className="text-sm text-background/75">
+                  ESP32 telemetry with low-latency updates
+                </p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>

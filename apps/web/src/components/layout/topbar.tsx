@@ -46,7 +46,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
     "FireGuard";
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/80 bg-background/75 px-4 backdrop-blur-xl sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
       <Button
         variant="ghost"
         size="icon"
@@ -57,88 +57,95 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
         <Menu className="h-5 w-5" />
       </Button>
 
-      <div className="min-w-0 flex-1">
-        <h1 className="truncate text-base font-semibold tracking-tight sm:text-lg">
+      <div className="min-w-0 lg:hidden">
+        <h1 className="truncate text-sm font-semibold tracking-tight">
           {title}
         </h1>
       </div>
 
-      <div className="hidden sm:block">
-        <ConnectionBadge compact />
+      {/* Centered search — quiet, Shopify-like */}
+      <div className="mx-auto hidden w-full max-w-md flex-1 md:block lg:absolute lg:left-1/2 lg:max-w-lg lg:-translate-x-1/2">
+        <button
+          type="button"
+          onClick={onSearchClick}
+          className="flex h-9 w-full items-center gap-2 rounded-xl border border-border/70 bg-muted/50 px-3 text-left text-sm text-muted-foreground transition-colors hover:bg-muted"
+          aria-label="Open command palette"
+        >
+          <Search className="h-3.5 w-3.5 shrink-0" />
+          <span className="flex-1 truncate">Search</span>
+          <kbd className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+            ⌘K
+          </kbd>
+        </button>
       </div>
 
-      <Button
-        variant="outline"
-        className="hidden h-10 gap-2 rounded-2xl border-border/80 bg-card/60 px-3 text-muted-foreground md:inline-flex"
-        onClick={onSearchClick}
-        aria-label="Open command palette"
-      >
-        <Search className="h-4 w-4" />
-        <span className="text-sm">Search</span>
-        <kbd className="ml-2 rounded-lg border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px]">
-          ⌘K
-        </kbd>
-      </Button>
+      <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <div className="hidden sm:block">
+          <ConnectionBadge compact />
+        </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden"
-        onClick={onSearchClick}
-        aria-label="Search"
-      >
-        <Search className="h-4 w-4" />
-      </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={onSearchClick}
+          aria-label="Search"
+        >
+          <Search className="h-4 w-4" />
+        </Button>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="Toggle theme"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      >
-        <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-        <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Toggle theme"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+        </Button>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="relative h-10 w-10 rounded-2xl p-0"
-            aria-label="User menu"
-          >
-            <Avatar className="h-10 w-10">
-              <AvatarFallback>{initials(user?.name)}</AvatarFallback>
-            </Avatar>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium">{user?.name ?? "User"}</p>
-              <p className="text-xs text-muted-foreground">
-                {user?.email ?? "—"}
-              </p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/profile")}>
-            <UserRound className="mr-2 h-4 w-4" />
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => router.push("/settings")}>
-            Settings
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            className="text-destructive focus:text-destructive"
-            onClick={() => logout()}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            Sign out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="relative h-9 w-9 rounded-full p-0"
+              aria-label="User menu"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="text-xs">
+                  {initials(user?.name)}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium">{user?.name ?? "User"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {user?.email ?? "—"}
+                </p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push("/profile")}>
+              <UserRound className="mr-2 h-4 w-4" />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push("/settings")}>
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
+              onClick={() => logout()}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   );
 }
