@@ -1,55 +1,62 @@
 # FireGuard IoT
 
-Premium fire alarm monitoring web app. Auth and data use **Supabase**. Live sensor values appear only when the **ESP32** posts telemetry — there is no dashboard simulator.
+Premium fire alarm monitoring. **Live values come only from the ESP32** — no simulator.
 
-## Architecture
+## What you need
+
+| Layer | Required |
+|-------|----------|
+| Vercel (`apps/web`) | Yes — UI + `/api` |
+| Supabase | Yes — auth + data |
+| ESP32 | Yes — only hardware |
+| NestJS / local DB / GAS | **No** |
 
 ```
-Browser (Next.js)
-    │  /api/*  (user JWT)
-    ▼
-Supabase  ←──  ESP32 POST /api/iot/telemetry  (x-device-key)
+Browser → Next.js /api (user JWT) → Supabase
+ESP32   → Next.js /api/iot/telemetry (x-device-key) → Supabase
 ```
 
-- **Frontend:** Next.js (`apps/web`)
-- **Auth / DB:** Supabase
-- **Hardware:** ESP32 sketch in `firmware/`
-- NestJS (`apps/api`) is optional legacy Socket.IO path (simulator disabled)
+## Deploy (once)
 
-## Setup
+1. Create a Supabase project and run `supabase/schema.sql`
+2. Deploy `apps/web` to Vercel (Root Directory: `apps/web`)
+3. Set env vars on Vercel:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY` ← required for ESP32 ingest + controls
+4. Do **not** set `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_WS_URL` / `GAS_SCRIPT_URL`
 
-1. Copy `apps/web/.env.local.example` → `apps/web/.env.local`
-2. Add Supabase URL, publishable/anon key, and **secret/service_role** key
-3. Run `supabase/schema.sql` (or the patch SQL files if schema already exists)
-4. `cd apps/web && npm install --legacy-peer-deps && npm run dev`
-5. Sign up in the app (full name, email, SMS, password)
+## Run the system (ESP32 starts the live function)
 
-Promote a developer:
+1. Open the deployed site → sign up / log in  
+   (a device key is **auto-created** for your account)
+2. **Settings → ESP32 flash setup** → copy the snippet
+3. Paste into `firmware/fireguard_esp32/fireguard_esp32.ino` (Wi‑Fi + `API_HOST` + `DEVICE_KEY`)
+4. Flash the board
 
-```sql
-update public.profiles set role = 'DEVELOPER' where email = 'you@example.com';
+Until the board posts telemetry, the UI correctly shows **OFFLINE / Waiting for ESP32**.
+
+### ESP32 endpoints
+
+- Telemetry: `POST /api/iot/telemetry` (`x-device-key`)
+- Commands: `GET /api/iot/telemetry?deviceKey=...`
+
+## Local development (optional)
+
+```bash
+cd apps/web
+cp .env.local.example .env.local   # add Supabase keys
+npm install --legacy-peer-deps
+npm run dev
 ```
 
-Details: [`supabase/README.md`](./supabase/README.md)
-
-## ESP32
-
-Flash `firmware/fireguard_esp32/fireguard_esp32.ino` after setting Wi‑Fi + `API_HOST` + `DEVICE_KEY` (`FG-ESP32-DEMO-001` matches the seeded offline device).
-
-- Telemetry: `POST /api/iot/telemetry`
-- Commands: `GET /api/iot/telemetry`
-
-Until the board is online, the UI correctly shows **OFFLINE / Waiting for ESP32**.
-
-## Vercel
-
-Root Directory: `apps/web`. Set the same Supabase env vars. Remove obsolete `GAS_SCRIPT_URL` if present. Do not set `NEXT_PUBLIC_API_URL` unless you host Nest separately.
+Point the sketch at your PC LAN IP with `API_HTTPS = false` and port `3000`.
 
 ## Repo layout
 
 | Path | Purpose |
 |------|---------|
-| `apps/web` | Next.js UI + API (Supabase + ESP32 ingest) |
-| `apps/api` | Optional NestJS |
+| `apps/web` | Next.js UI + API (production path) |
 | `firmware/` | ESP32 HTTP client |
-| `supabase/` | Schema + setup notes |
+| `supabase/` | Schema |
+| `apps/api` | Optional legacy NestJS — not required |

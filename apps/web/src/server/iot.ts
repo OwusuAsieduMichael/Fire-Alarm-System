@@ -1,6 +1,9 @@
 import { adminDb, mapDevice, isFresh } from "./supabase-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/database.types";
 import type { LiveDeviceState } from "@/types";
+
+type DeviceRow = Database["public"]["Tables"]["devices"]["Row"];
 
 export type ControlAction =
   | "test-alarm"
@@ -203,20 +206,39 @@ export async function enqueueControl(
     };
   }
 
-  let deviceQuery = db.from("devices").select("*").limit(1);
+  // Prefer the caller's selected device; never grab an unrelated admin row.
+  let deviceRow: DeviceRow | null = null;
+
   if (deviceId) {
-    deviceQuery = db.from("devices").select("*").eq("id", deviceId).limit(1);
+    const { data: devices, error } = await db
+      .from("devices")
+      .select("*")
+      .eq("id", deviceId)
+      .limit(1);
+    if (error) {
+      return { ok: false as const, status: 500, message: error.message };
+    }
+    deviceRow = devices?.[0] ?? null;
+  } else if (access?.userId && access.accessToken) {
+    const userClient = createSupabaseServerClient(access.accessToken);
+    if (userClient) {
+      const { data: owned, error } = await userClient
+        .from("devices")
+        .select("*")
+        .order("created_at", { ascending: true })
+        .limit(1);
+      if (error) {
+        return { ok: false as const, status: 500, message: error.message };
+      }
+      deviceRow = owned?.[0] ?? null;
+    }
   }
-  const { data: devices, error } = await deviceQuery;
-  if (error) {
-    return { ok: false as const, status: 500, message: error.message };
-  }
-  const deviceRow = devices?.[0];
+
   if (!deviceRow) {
     return {
       ok: false as const,
       status: 404,
-      message: "No device registered. Create one in Settings.",
+      message: "No device registered. Open the app once to auto-create one, then flash your ESP32.",
     };
   }
 

@@ -52,9 +52,17 @@ export function useDevices() {
     queryKey: ["devices"],
     queryFn: async () => {
       const { apiClient: client } = await import("@/lib/api");
-      const devices = await client.get<
-        import("@/types").Device[]
-      >("/devices");
+      let devices = await client.get<import("@/types").Device[]>("/devices");
+
+      // Auto-provision so flashing the ESP32 is the only hardware step.
+      if (devices.length === 0) {
+        await client.post<{
+          created: boolean;
+          device: import("@/types").Device;
+        }>("/devices/ensure");
+        devices = await client.get<import("@/types").Device[]>("/devices");
+      }
+
       setDevices(devices);
       return devices;
     },

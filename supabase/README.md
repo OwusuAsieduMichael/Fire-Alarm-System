@@ -17,13 +17,13 @@ Creates:
 
 - `profiles` (Auth users + SMS contact)
 - `devices`, `sensor_readings`, `alerts`, `connection_logs`, `device_commands`
-- One **OFFLINE** placeholder device (`FG-ESP32-DEMO-001`) — no fake live data
+- Optional seed device `FG-ESP32-DEMO-001` (developer-only). Normal users get their own key auto-created on first app open.
 
 ## 3. Auth
 
-Enable Email provider. For local testing you can disable **Confirm email**.
+Enable Email provider. Presentation signup uses the service role to confirm email without inbox limits.
 
-Sign up in the web app (full name, email, SMS, password). Login uses email + password.
+Sign up in the web app → a personal `DEVICE_KEY` is provisioned → flash that key onto the ESP32.
 
 Promote a developer:
 
