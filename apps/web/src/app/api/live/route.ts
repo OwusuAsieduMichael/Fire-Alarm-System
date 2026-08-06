@@ -1,15 +1,11 @@
 import { isResponse, json, requireUser } from "@/server/http";
 import { getStore, tickSimulator } from "@/server/store";
-import { withGas } from "@/server/with-gas";
 
 export const runtime = "nodejs";
 
-/** Polling endpoint — proxies to Google Apps Script when GAS_SCRIPT_URL is set. */
+/** Live telemetry polling endpoint for the in-app simulator / local API. */
 export async function GET(req: Request) {
-  const gas = await withGas(req, "/live");
-  if (gas) return gas;
-
-  const user = requireUser(req);
+  const user = await requireUser(req);
   if (isResponse(user)) return user;
   const live = tickSimulator();
   const store = getStore();

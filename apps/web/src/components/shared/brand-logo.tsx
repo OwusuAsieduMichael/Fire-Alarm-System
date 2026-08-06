@@ -15,11 +15,11 @@ export function BrandLogo({
   return (
     <Image
       src="/FLAMELOGO.png"
-      alt="FireGuard"
+      alt="FireGuard Fire Alarm System"
       width={size}
       height={size}
       priority={priority}
-      className={cn("object-contain", className)}
+      className={cn("h-auto w-auto max-w-full object-contain", className)}
     />
   );
 }

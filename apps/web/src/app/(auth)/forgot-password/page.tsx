@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Loader2, MailCheck } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { apiClient, ApiError } from "@/lib/api";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { cn } from "@/lib/utils";
 
 const schema = z.object({
@@ -31,24 +32,31 @@ export default function ForgotPasswordPage() {
 
     setLoading(true);
     try {
-      await apiClient.post(
-        "/auth/forgot-password",
-        { email: parsed.data.email },
-        { skipAuth: true }
+      if (!isSupabaseConfigured()) {
+        throw new Error("Supabase is not configured.");
+      }
+      const client = getSupabaseBrowserClient();
+      if (!client) throw new Error("Unable to initialize Supabase client.");
+
+      const redirectTo =
+        typeof window !== "undefined"
+          ? `${window.location.origin}/login`
+          : undefined;
+
+      const { error: resetError } = await client.auth.resetPasswordForEmail(
+        parsed.data.email,
+        redirectTo ? { redirectTo } : undefined
       );
+      if (resetError) throw resetError;
+
       setSent(true);
       toast.success("Reset instructions sent if the account exists.");
     } catch (err) {
-      if (err instanceof ApiError && err.status === 404) {
-        setSent(true);
-        toast.message("If an account exists, reset instructions were sent.");
-      } else {
-        const message =
-          err instanceof ApiError
-            ? err.message
-            : "Unable to process request right now.";
-        toast.error(message);
-      }
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Unable to process request right now."
+      );
     } finally {
       setLoading(false);
     }

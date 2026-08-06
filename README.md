@@ -1,49 +1,33 @@
 # FireGuard IoT
 
-Premium fire alarm monitoring **web app**.
+Premium fire alarm monitoring web app.
 
-## Recommended architecture
+## Architecture
 
 ```
 Browser (Vercel / Next.js UI)
     │
     ▼  /api/*
-Next.js API routes (CORS-safe proxy)
+Next.js API routes (local simulator + auth)
     │
-    ▼  GAS_SCRIPT_URL
-Google Apps Script backend (auth, sensors, controls, simulator)
+    ▼  (in progress)
+Supabase — durable auth, devices, sensors, alerts
 ```
 
-- **Frontend:** Next.js on Vercel  
-- **Backend:** Google Apps Script web app  
-- NestJS in `apps/api` is optional (local/hardware only)
+- **Frontend:** Next.js on Vercel
+- **Backend target:** Supabase (Google Apps Script has been removed)
+- NestJS in `apps/api` remains optional for ESP32 / Socket.IO hardware work
 
 ---
 
-## 1) Deploy Google Apps Script backend
-
-See full steps in [`gas/README.md`](./gas/README.md).
-
-Short version:
-
-1. Create a new Apps Script project at [script.google.com](https://script.google.com)
-2. Paste [`gas/Code.gs`](./gas/Code.gs)
-3. Deploy → Web app → **Anyone** access
-4. Copy the `/exec` URL
-
-## 2) Deploy frontend on Vercel
+## Deploy frontend on Vercel
 
 1. Import this GitHub repo
 2. Set **Root Directory** to `apps/web`
-3. Add environment variable:
-
-| Name | Value |
-|------|--------|
-| `GAS_SCRIPT_URL` | `https://script.google.com/macros/s/.../exec` |
-
+3. Set `JWT_SECRET` (and Supabase vars when ready)
 4. Deploy
 
-Do **not** set `NEXT_PUBLIC_API_URL` on Vercel.
+Do **not** set `NEXT_PUBLIC_API_URL` on Vercel unless you host NestJS separately.
 
 ## Demo logins
 
@@ -60,20 +44,27 @@ npm install --legacy-peer-deps
 npm run dev
 ```
 
-Without `GAS_SCRIPT_URL`, the app uses the built-in Next.js in-memory API + simulator.
+Copy `apps/web/.env.local.example` → `apps/web/.env.local` and fill values.
 
-With GAS:
+Without Supabase credentials, the app uses the built-in Next.js in-memory API + simulator.
 
-```env
-GAS_SCRIPT_URL=https://script.google.com/macros/s/XXXX/exec
-```
+## Supabase setup
+
+See [`supabase/README.md`](./supabase/README.md) for schema + demo users.
+
+1. Create a Supabase project  
+2. Run `supabase/schema.sql` in the SQL editor  
+3. Add env vars from `apps/web/.env.local.example`
+
+## Important: Vercel env cleanup
+
+Remove **`GAS_SCRIPT_URL`** from Vercel (and any local `.env`) if it is still set. That variable is obsolete.
 
 ## Repo layout
 
 | Path | Purpose |
 |------|---------|
-| `apps/web` | Next.js UI + `/api` proxy |
-| `gas/` | Google Apps Script backend |
+| `apps/web` | Next.js UI + `/api` routes |
 | `apps/api` | Optional NestJS (ESP32 / Socket.IO) |
 | `firmware/` | ESP32 sketch |
 

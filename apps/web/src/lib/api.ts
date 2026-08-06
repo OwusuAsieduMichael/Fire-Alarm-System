@@ -3,6 +3,8 @@
  * - If NEXT_PUBLIC_API_URL is set → NestJS / external API
  * - Otherwise → same-origin Next.js `/api/*` (Vercel-ready)
  */
+import { useAuthStore } from "@/stores/auth-store";
+
 const EXTERNAL_API =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "";
 
@@ -20,14 +22,7 @@ export class ApiError extends Error {
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem("fireguard-auth");
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { state?: { token?: string | null } };
-    return parsed.state?.token ?? null;
-  } catch {
-    return null;
-  }
+  return useAuthStore.getState().token;
 }
 
 function resolveUrl(path: string): string {

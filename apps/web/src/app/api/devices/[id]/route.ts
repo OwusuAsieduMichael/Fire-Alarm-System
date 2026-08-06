@@ -1,6 +1,5 @@
 import { error, isResponse, json, requireUser } from "@/server/http";
 import { getStore, tickSimulator } from "@/server/store";
-import { withGas } from "@/server/with-gas";
 
 export const runtime = "nodejs";
 
@@ -8,10 +7,7 @@ type Ctx = { params: Promise<{ id: string }> };
 
 export async function GET(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
-  const gas = await withGas(req, `/devices/${id}`);
-  if (gas) return gas;
-
-  const user = requireUser(req);
+  const user = await requireUser(req);
   if (isResponse(user)) return user;
   tickSimulator();
   const store = getStore();
@@ -25,10 +21,7 @@ export async function GET(req: Request, ctx: Ctx) {
 
 export async function PATCH(req: Request, ctx: Ctx) {
   const { id } = await ctx.params;
-  const gas = await withGas(req, `/devices/${id}`);
-  if (gas) return gas;
-
-  const user = requireUser(req);
+  const user = await requireUser(req);
   if (isResponse(user)) return user;
   if (user.role !== "DEVELOPER") return error("Insufficient permissions", 403);
 

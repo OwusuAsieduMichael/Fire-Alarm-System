@@ -3,51 +3,53 @@
 import * as React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2, UserRound } from "lucide-react";
+import { Eye, EyeOff, Loader2, Phone, UserRound } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
-const loginSchema = z.object({
+const signupSchema = z.object({
+  fullName: z.string().trim().min(2, "Enter your full name"),
   email: z.string().email("Enter a valid email"),
+  phone: z
+    .string()
+    .trim()
+    .min(8, "Enter a valid SMS contact number")
+    .regex(/^[+\d][\d\s()-]{6,}$/, "Use digits, optional + country code"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-const REMEMBER_KEY = "fireguard.rememberEmail";
-
-export default function LoginPage() {
-  const { login } = useAuth();
+export default function SignUpPage() {
+  const { signUp } = useAuth();
+  const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [phone, setPhone] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
-  const [remember, setRemember] = React.useState(true);
   const [errors, setErrors] = React.useState<{
+    fullName?: string;
     email?: string;
+    phone?: string;
     password?: string;
   }>({});
   const [loading, setLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    try {
-      const saved = localStorage.getItem(REMEMBER_KEY);
-      if (saved) {
-        setEmail(saved);
-        setRemember(true);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setErrors({});
 
-    const parsed = loginSchema.safeParse({ email, password });
+    const parsed = signupSchema.safeParse({
+      fullName,
+      email,
+      phone,
+      password,
+    });
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors;
       setErrors({
+        fullName: fieldErrors.fullName?.[0],
         email: fieldErrors.email?.[0],
+        phone: fieldErrors.phone?.[0],
         password: fieldErrors.password?.[0],
       });
       return;
@@ -55,16 +57,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      try {
-        if (remember) {
-          localStorage.setItem(REMEMBER_KEY, parsed.data.email);
-        } else {
-          localStorage.removeItem(REMEMBER_KEY);
-        }
-      } catch {
-        // ignore
-      }
-      await login(parsed.data.email, parsed.data.password);
+      await signUp(parsed.data);
     } catch {
       // toast handled in useAuth
     } finally {
@@ -75,30 +68,30 @@ export default function LoginPage() {
   return (
     <div className="space-y-7 text-white">
       <div className="space-y-2 text-center sm:text-left">
-        <h1 className="text-3xl font-semibold tracking-tight">Login</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Sign up</h1>
         <p className="text-sm text-white/70">
-          Welcome back — sign in with your email and password.
+          Create an account to monitor your fire alarm system. SMS contact is
+          used for alert notifications.
         </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <div className="space-y-1.5">
-          <label htmlFor="email" className="sr-only">
-            Email
+          <label htmlFor="fullName" className="sr-only">
+            Full name
           </label>
           <div className="relative">
             <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? "email-error" : undefined}
+              id="fullName"
+              type="text"
+              autoComplete="name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Full name"
+              aria-invalid={Boolean(errors.fullName)}
               className={cn(
-                "auth-glass-input peer w-full pr-11",
-                errors.email && "border-red-300/80"
+                "auth-glass-input w-full pr-11",
+                errors.fullName && "border-red-300/80"
               )}
             />
             <UserRound
@@ -106,35 +99,78 @@ export default function LoginPage() {
               aria-hidden="true"
             />
           </div>
-          {errors.email ? (
-            <p id="email-error" className="text-xs text-red-200">
-              {errors.email}
-            </p>
+          {errors.fullName ? (
+            <p className="text-xs text-red-200">{errors.fullName}</p>
           ) : null}
         </div>
 
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between gap-2 px-0.5">
-            <label htmlFor="password" className="sr-only">
-              Password
-            </label>
-            <Link
-              href="/forgot-password"
-              className="ml-auto text-xs font-medium text-white/65 transition-colors hover:text-white"
-            >
-              Forgot password?
-            </Link>
+          <label htmlFor="email" className="sr-only">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            aria-invalid={Boolean(errors.email)}
+            className={cn(
+              "auth-glass-input w-full",
+              errors.email && "border-red-300/80"
+            )}
+          />
+          {errors.email ? (
+            <p className="text-xs text-red-200">{errors.email}</p>
+          ) : null}
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="phone" className="sr-only">
+            SMS contact
+          </label>
+          <div className="relative">
+            <input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="SMS contact (e.g. +233…)"
+              aria-invalid={Boolean(errors.phone)}
+              className={cn(
+                "auth-glass-input w-full pr-11",
+                errors.phone && "border-red-300/80"
+              )}
+            />
+            <Phone
+              className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/55"
+              aria-hidden="true"
+            />
           </div>
+          {errors.phone ? (
+            <p className="text-xs text-red-200">{errors.phone}</p>
+          ) : (
+            <p className="px-0.5 text-[11px] text-white/45">
+              Alerts and fire notifications are sent to this number.
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="password" className="sr-only">
+            Password
+          </label>
           <div className="relative">
             <input
               id="password"
               type={showPassword ? "text" : "password"}
-              autoComplete="current-password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? "password-error" : undefined}
               className={cn(
                 "auth-glass-input w-full pr-11",
                 errors.password && "border-red-300/80"
@@ -154,41 +190,9 @@ export default function LoginPage() {
             </button>
           </div>
           {errors.password ? (
-            <p id="password-error" className="text-xs text-red-200">
-              {errors.password}
-            </p>
+            <p className="text-xs text-red-200">{errors.password}</p>
           ) : null}
         </div>
-
-        <label className="flex cursor-pointer items-center gap-2.5 px-0.5 pt-1 text-sm text-white/80">
-          <input
-            type="checkbox"
-            checked={remember}
-            onChange={(e) => setRemember(e.target.checked)}
-            className="peer sr-only"
-          />
-          <span
-            className={cn(
-              "flex h-4 w-4 items-center justify-center rounded-[4px] border border-white/45 transition-colors",
-              remember && "border-transparent bg-emerald-500"
-            )}
-            aria-hidden="true"
-          >
-            {remember ? (
-              <svg viewBox="0 0 12 12" className="h-2.5 w-2.5 text-white">
-                <path
-                  d="M2.5 6.2 5 8.5 9.5 3.5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : null}
-          </span>
-          Remember me
-        </label>
 
         <motion.div whileTap={{ scale: 0.985 }} className="pt-1">
           <button
@@ -200,22 +204,22 @@ export default function LoginPage() {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Signing in…
+                Creating account…
               </>
             ) : (
-              "Login"
+              "Create account"
             )}
           </button>
         </motion.div>
       </form>
 
       <p className="text-center text-sm text-white/65">
-        New to FireGuard?{" "}
+        Already have an account?{" "}
         <Link
-          href="/signup"
+          href="/login"
           className="font-semibold text-white underline-offset-4 hover:underline"
         >
-          Sign up
+          Login
         </Link>
       </p>
     </div>

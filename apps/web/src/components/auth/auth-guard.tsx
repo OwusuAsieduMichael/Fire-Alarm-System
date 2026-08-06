@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getPostAuthEntryPath } from "@/lib/onboarding";
 import { useAuthStore } from "@/stores/auth-store";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -12,7 +13,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (hydrated && !token) {
-      router.replace("/login");
+      router.replace(getPostAuthEntryPath());
     }
   }, [hydrated, token, router]);
 

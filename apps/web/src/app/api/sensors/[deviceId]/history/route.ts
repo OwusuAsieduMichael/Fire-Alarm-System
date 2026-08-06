@@ -1,6 +1,5 @@
 import { isResponse, json, requireUser } from "@/server/http";
 import { getStore, tickSimulator } from "@/server/store";
-import { withGas } from "@/server/with-gas";
 
 export const runtime = "nodejs";
 
@@ -8,10 +7,7 @@ type Ctx = { params: Promise<{ deviceId: string }> };
 
 export async function GET(req: Request, ctx: Ctx) {
   const { deviceId } = await ctx.params;
-  const gas = await withGas(req, `/sensors/${deviceId}/history`);
-  if (gas) return gas;
-
-  const user = requireUser(req);
+  const user = await requireUser(req);
   if (isResponse(user)) return user;
   tickSimulator();
 

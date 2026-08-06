@@ -1,14 +1,10 @@
 import { toAuthUser, verifyPassword, signToken } from "@/server/auth";
 import { error, json } from "@/server/http";
 import { getStore } from "@/server/store";
-import { withGas } from "@/server/with-gas";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const gas = await withGas(req, "/auth/login");
-  if (gas) return gas;
-
   const body = (await req.json().catch(() => null)) as {
     email?: string;
     password?: string;

@@ -3,11 +3,41 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { apiClient, ApiError } from "@/lib/api";
 import { disconnectSocket } from "@/lib/socket";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import {
+  ensureProfilePhone,
+  fetchProfile,
+} from "@/lib/supabase/profile";
 import { useAuthStore } from "@/stores/auth-store";
 import { useDeviceStore } from "@/stores/device-store";
-import type { AuthLoginResponse, User } from "@/types";
+import type { User } from "@/types";
+
+export type SignUpInput = {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+};
+
+function requireSupabase() {
+  if (!isSupabaseConfigured()) {
+    throw new Error(
+      "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local."
+    );
+  }
+  const client = getSupabaseBrowserClient();
+  if (!client) {
+    throw new Error("Unable to initialize Supabase client.");
+  }
+  return client;
+}
+
+function authErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
 
 export function useAuth() {
   const router = useRouter();
@@ -24,30 +54,104 @@ export function useAuth() {
   const login = useCallback(
     async (email: string, password: string) => {
       try {
-        const data = await apiClient.post<AuthLoginResponse>(
-          "/auth/login",
-          { email, password },
-          { skipAuth: true }
-        );
-        setAuth(data.user, data.accessToken);
-        toast.success(`Welcome back, ${data.user.name.split(" ")[0]}`);
+        const client = requireSupabase();
+        const { data, error } = await client.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+
+        if (error) throw error;
+        if (!data.session?.user) {
+          throw new Error("Sign-in failed. No session returned.");
+        }
+
+        const profile = await fetchProfile(client, data.session.user.id);
+        if (!profile) {
+          throw new Error(
+            "Account exists but profile is missing. Run the Supabase schema SQL, then try again."
+          );
+        }
+
+        setAuth(profile, data.session.access_token);
+        toast.success(`Welcome back, ${profile.name.split(" ")[0]}`);
         router.replace("/dashboard");
-        return data;
+        return { user: profile, accessToken: data.session.access_token };
       } catch (error) {
-        const message =
-          error instanceof ApiError
-            ? error.message
-            : "Unable to sign in. Check your credentials.";
-        toast.error(message);
+        toast.error(
+          authErrorMessage(error, "Unable to sign in. Check your credentials.")
+        );
         throw error;
       }
     },
     [setAuth, router]
   );
 
-  const logout = useCallback(() => {
+  const signUp = useCallback(
+    async (input: SignUpInput) => {
+      try {
+        const client = requireSupabase();
+        const fullName = input.fullName.trim();
+        const email = input.email.trim().toLowerCase();
+        const phone = input.phone.trim();
+
+        const { data, error } = await client.auth.signUp({
+          email,
+          password: input.password,
+          options: {
+            data: {
+              name: fullName,
+              full_name: fullName,
+              phone,
+              sms: phone,
+            },
+          },
+        });
+
+        if (error) throw error;
+        if (!data.user) {
+          throw new Error("Sign-up failed. No user returned.");
+        }
+
+        // Email confirmation enabled → no session until confirmed
+        if (!data.session) {
+          toast.success(
+            "Account created. Check your email to confirm, then sign in."
+          );
+          router.replace("/login");
+          return { needsConfirmation: true as const };
+        }
+
+        await ensureProfilePhone(client, data.session.user.id, phone);
+        const profile = await fetchProfile(client, data.session.user.id);
+        if (!profile) {
+          throw new Error(
+            "Account created but profile is missing. Run supabase/schema.sql (or patch-profile-phone.sql), then sign in."
+          );
+        }
+
+        setAuth(profile, data.session.access_token);
+        toast.success(`Welcome, ${profile.name.split(" ")[0]}`);
+        router.replace("/dashboard");
+        return { needsConfirmation: false as const, user: profile };
+      } catch (error) {
+        toast.error(
+          authErrorMessage(error, "Unable to create your account.")
+        );
+        throw error;
+      }
+    },
+    [setAuth, router]
+  );
+
+  const logout = useCallback(async () => {
     disconnectSocket();
     resetLive();
+    try {
+      const client = getSupabaseBrowserClient();
+      if (client) await client.auth.signOut();
+    } catch {
+      // ignore sign-out network errors
+    }
     logoutStore();
     toast.message("Signed out");
     router.replace("/login");
@@ -66,6 +170,7 @@ export function useAuth() {
     hydrated,
     isAuthenticated,
     login,
+    signUp,
     logout,
     setUser: updateUser,
   };

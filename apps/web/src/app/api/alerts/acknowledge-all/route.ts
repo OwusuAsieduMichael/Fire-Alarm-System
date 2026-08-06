@@ -1,14 +1,10 @@
 import { isResponse, json, requireUser } from "@/server/http";
 import { getStore } from "@/server/store";
-import { withGas } from "@/server/with-gas";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const gas = await withGas(req, "/alerts/acknowledge-all");
-  if (gas) return gas;
-
-  const user = requireUser(req);
+  const user = await requireUser(req);
   if (isResponse(user)) return user;
   const url = new URL(req.url);
   const deviceId = url.searchParams.get("deviceId");

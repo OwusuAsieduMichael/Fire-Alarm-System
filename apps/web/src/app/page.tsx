@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getPostAuthEntryPath } from "@/lib/onboarding";
 import { useAuthStore } from "@/stores/auth-store";
 
 export default function HomePage() {
@@ -12,7 +13,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    router.replace(token ? "/dashboard" : "/login");
+    router.replace(token ? "/dashboard" : getPostAuthEntryPath());
   }, [hydrated, token, router]);
 
   return (
