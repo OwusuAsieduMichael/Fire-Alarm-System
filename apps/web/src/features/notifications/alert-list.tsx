@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
+import { listItemFade, springSoft } from "@/lib/motion";
 import type { Alert, AlertSeverity, SmsStatus } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -58,22 +59,15 @@ export function AlertList({
 
   return (
     <ul className="space-y-3">
-      <AnimatePresence initial={false}>
-        {alerts.map((alert, index) => (
+      <AnimatePresence initial={false} mode="popLayout">
+        {alerts.map((alert) => (
           <motion.li
             key={alert.id}
             layout
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 28,
-              delay: Math.min(index * 0.03, 0.2),
-            }}
+            {...listItemFade}
+            transition={springSoft}
             className={cn(
-              "rounded-[1.25rem] border border-border/70 border-l-[3px] bg-card/95 p-4 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated dark:border-white/[0.06] dark:bg-card sm:p-5",
+              "rounded-[1.25rem] border border-border/70 border-l-[3px] bg-card p-4 shadow-soft transition-shadow duration-200 hover:shadow-elevated sm:p-5",
               severityStyles[alert.severity],
               alert.acknowledged && "opacity-65"
             )}

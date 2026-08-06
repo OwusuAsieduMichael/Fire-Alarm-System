@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useSpring, useTransform } from "framer-motion";
+import { useSpring, useTransform } from "framer-motion";
 import { cn, formatSensorValue } from "@/lib/utils";
 
 interface LiveValueProps {
@@ -12,6 +12,7 @@ interface LiveValueProps {
   unitClassName?: string;
 }
 
+/** Smooth number spring — no remount bounce. */
 export function LiveValue({
   value,
   decimals = 1,
@@ -20,7 +21,7 @@ export function LiveValue({
   unitClassName,
 }: LiveValueProps) {
   const safe = typeof value === "number" && !Number.isNaN(value) ? value : 0;
-  const spring = useSpring(safe, { stiffness: 120, damping: 20, mass: 0.4 });
+  const spring = useSpring(safe, { stiffness: 140, damping: 22, mass: 0.45 });
   const display = useTransform(spring, (latest) =>
     formatSensorValue(latest, decimals)
   );
@@ -45,15 +46,7 @@ export function LiveValue({
 
   return (
     <span className={cn("inline-flex items-baseline gap-1", className)}>
-      <motion.span
-        key={Math.round(safe * 10)}
-        className="sensor-value"
-        initial={{ opacity: 0.45, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 280, damping: 24 }}
-      >
-        {text}
-      </motion.span>
+      <span className="sensor-value">{text}</span>
       {unit ? (
         <span
           className={cn(

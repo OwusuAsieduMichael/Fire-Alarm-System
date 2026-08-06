@@ -30,8 +30,9 @@ export default function DeveloperPage() {
 
   if (role !== "DEVELOPER") {
     return (
-      <div className="space-y-8">
+      <div className="space-y-7">
         <PageHeader
+          eyebrow="Diagnostics"
           title="Developer"
           description="Developer tools require elevated access."
         />
@@ -45,8 +46,9 @@ export default function DeveloperPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Diagnostics"
         title="Developer"
         description="ESP32 diagnostics, debug console, and connection logs."
       />

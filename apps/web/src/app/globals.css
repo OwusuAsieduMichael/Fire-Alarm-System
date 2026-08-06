@@ -4,115 +4,115 @@
 
 @layer base {
   :root {
-    /* Industrial graphite light — warm stone, no pure white */
-    --background: 32 10% 90%;
-    --foreground: 28 14% 12%;
+    /* Calm graphite light — premium IoT console */
+    --background: 40 12% 96%;
+    --foreground: 30 12% 10%;
 
-    --card: 36 14% 96%;
-    --card-foreground: 28 14% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 12% 10%;
 
-    --popover: 36 16% 97%;
-    --popover-foreground: 28 14% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 12% 10%;
 
-    --primary: 348 78% 44%;
+    --primary: 348 72% 46%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 9% 86%;
-    --secondary-foreground: 28 12% 24%;
+    --secondary: 40 10% 93%;
+    --secondary-foreground: 30 10% 28%;
 
-    --muted: 30 8% 88%;
-    --muted-foreground: 28 8% 38%;
+    --muted: 40 10% 94%;
+    --muted-foreground: 30 6% 42%;
 
-    --accent: 30 10% 87%;
-    --accent-foreground: 28 14% 14%;
+    --accent: 40 12% 93%;
+    --accent-foreground: 30 12% 14%;
 
-    --destructive: 4 78% 48%;
+    --destructive: 4 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --ember: 348 78% 44%;
+    --ember: 348 72% 46%;
     --ember-foreground: 0 0% 100%;
-    --ember-muted: 348 40% 92%;
+    --ember-muted: 348 45% 96%;
 
-    --success: 145 48% 32%;
+    --success: 152 45% 34%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 36 88% 44%;
+    --warning: 38 85% 46%;
     --warning-foreground: 32 80% 12%;
 
-    --info: 210 55% 38%;
+    --info: 211 70% 42%;
     --info-foreground: 0 0% 100%;
 
-    --surface: 30 9% 87%;
-    --surface-elevated: 36 16% 97%;
+    --surface: 40 14% 94%;
+    --surface-elevated: 0 0% 100%;
 
-    --border: 30 10% 78%;
-    --input: 30 10% 78%;
-    --ring: 28 12% 28%;
+    --border: 35 10% 88%;
+    --input: 35 10% 88%;
+    --ring: 30 10% 30%;
 
-    --radius: 1.125rem;
+    --radius: 1.25rem;
 
-    --shadow-soft: 0 1px 2px hsl(28 18% 10% / 0.06),
-      0 6px 18px hsl(28 18% 10% / 0.06);
-    --shadow-elevated: 0 4px 12px hsl(28 18% 10% / 0.08),
-      0 20px 44px hsl(28 18% 10% / 0.1);
-    --shadow-glow: 0 0 0 1px hsl(348 78% 44% / 0.16),
-      0 12px 30px hsl(348 78% 44% / 0.14);
+    --shadow-soft: 0 1px 2px hsl(30 20% 10% / 0.04),
+      0 8px 24px hsl(30 20% 10% / 0.05);
+    --shadow-elevated: 0 4px 12px hsl(30 20% 10% / 0.06),
+      0 24px 48px hsl(30 20% 10% / 0.08);
+    --shadow-glow: 0 0 0 1px hsl(348 72% 46% / 0.14),
+      0 12px 32px hsl(348 72% 46% / 0.12);
 
     --ease-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
     --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .dark {
-    --background: 240 8% 6%;
+    --background: 240 8% 5%;
     --foreground: 240 8% 96%;
 
-    --card: 240 7% 10%;
+    --card: 240 7% 9%;
     --card-foreground: 240 8% 96%;
 
-    --popover: 240 7% 11%;
+    --popover: 240 7% 10%;
     --popover-foreground: 240 8% 96%;
 
-    --primary: 348 78% 54%;
+    --primary: 348 72% 54%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 6% 14%;
+    --secondary: 240 6% 13%;
     --secondary-foreground: 240 8% 90%;
 
-    --muted: 240 6% 13%;
-    --muted-foreground: 240 5% 60%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 58%;
 
-    --accent: 240 6% 14%;
+    --accent: 240 6% 13%;
     --accent-foreground: 240 8% 92%;
 
-    --destructive: 4 72% 50%;
+    --destructive: 4 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --ember: 348 78% 54%;
+    --ember: 348 72% 54%;
     --ember-foreground: 0 0% 100%;
-    --ember-muted: 348 30% 14%;
+    --ember-muted: 348 28% 14%;
 
-    --success: 145 48% 42%;
+    --success: 152 42% 42%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 90% 52%;
+    --warning: 38 88% 52%;
     --warning-foreground: 32 80% 10%;
 
-    --info: 211 85% 58%;
+    --info: 211 80% 58%;
     --info-foreground: 0 0% 100%;
 
-    --surface: 240 8% 7%;
-    --surface-elevated: 240 7% 12%;
+    --surface: 240 8% 6%;
+    --surface-elevated: 240 7% 11%;
 
-    --border: 240 6% 18%;
-    --input: 240 6% 18%;
-    --ring: 211 85% 58%;
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 211 80% 58%;
 
-    --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.35),
-      0 8px 24px hsl(0 0% 0% / 0.25);
-    --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.35),
-      0 24px 48px hsl(0 0% 0% / 0.4);
-    --shadow-glow: 0 0 0 1px hsl(348 78% 54% / 0.22),
-      0 12px 36px hsl(348 78% 54% / 0.18);
+    --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.4),
+      0 8px 28px hsl(0 0% 0% / 0.28);
+    --shadow-elevated: 0 8px 24px hsl(0 0% 0% / 0.4),
+      0 28px 56px hsl(0 0% 0% / 0.45);
+    --shadow-glow: 0 0 0 1px hsl(348 72% 54% / 0.22),
+      0 14px 36px hsl(348 72% 54% / 0.2);
   }
 
   * {
@@ -134,7 +134,7 @@
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-ring/55 ring-offset-2 ring-offset-background;
+    @apply outline-none ring-2 ring-ring/50 ring-offset-2 ring-offset-background;
   }
 
   ::selection {
@@ -144,11 +144,20 @@
 
 @layer components {
   .glass {
-    @apply border border-border/40 bg-card/70 backdrop-blur-2xl;
+    @apply border border-border/60 bg-card/80 backdrop-blur-xl;
   }
 
   .surface-panel {
-    @apply rounded-[1.35rem] border border-border/70 bg-card/95 shadow-soft backdrop-blur-sm;
+    @apply rounded-[1.25rem] border border-border/70 bg-card shadow-soft;
+  }
+
+  .fg-card {
+    @apply rounded-[1.25rem] border border-border/70 bg-card text-card-foreground shadow-soft;
+  }
+
+  .fg-press {
+    @apply transition-transform duration-150 active:scale-[0.98];
+    transition-timing-function: var(--ease-apple);
   }
 
   .workspace-canvas {
@@ -156,8 +165,10 @@
   }
 
   .card-interactive {
-    @apply transition-all duration-300;
-    transition-timing-function: var(--ease-spring);
+    transition:
+      transform 0.28s var(--ease-spring),
+      box-shadow 0.28s var(--ease-apple),
+      border-color 0.2s var(--ease-apple);
   }
 
   .card-interactive:hover {
@@ -249,11 +260,21 @@
   }
 
   .metric-label {
-    @apply text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground;
+    @apply text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground;
   }
 
   .section-title {
     @apply text-[17px] font-semibold tracking-tight text-foreground;
+  }
+
+  .safe-bottom-nav {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (min-width: 1024px) {
+    .safe-bottom-nav {
+      padding-bottom: 0;
+    }
   }
 }
 

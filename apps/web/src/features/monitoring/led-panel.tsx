@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDeviceStore } from "@/stores/device-store";
 import { cn } from "@/lib/utils";
@@ -53,7 +52,7 @@ export function LedPanel() {
   const active = normalizeLed(ledStatus);
 
   return (
-    <Card className="border-border/55">
+    <Card>
       <CardHeader className="pb-3">
         <p className="metric-label">Indicator</p>
         <CardTitle className="mt-1.5 text-lg">LED status</CardTitle>
@@ -71,23 +70,21 @@ export function LedPanel() {
                   on && "bg-muted/40"
                 )}
               >
-                <motion.div
+                <div
                   className={cn(
                     "flex h-12 w-12 items-center justify-center rounded-full border-2",
                     meta.ring
                   )}
-                  animate={on ? { scale: [1, 1.06, 1] } : { scale: 1 }}
-                  transition={{ duration: 1.2, repeat: on ? Infinity : 0 }}
                 >
                   <span
                     className={cn(
-                      "h-7 w-7 rounded-full transition-all",
+                      "h-7 w-7 rounded-full transition-opacity",
                       meta.fill,
-                      on ? meta.glow : "opacity-35"
+                      on ? `${meta.glow} opacity-100` : "opacity-35"
                     )}
                     aria-hidden="true"
                   />
-                </motion.div>
+                </div>
                 <span className="text-xs font-medium capitalize text-muted-foreground">
                   {color}
                 </span>

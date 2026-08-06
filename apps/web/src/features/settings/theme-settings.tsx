@@ -39,10 +39,10 @@ export function ThemeSettings() {
                 aria-checked={selected}
                 onClick={() => setTheme(value)}
                 className={cn(
-                  "flex flex-col items-center gap-2.5 rounded-[1.1rem] border px-3 py-5 text-[13px] font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "flex flex-col items-center gap-2.5 rounded-[1.15rem] border px-3 py-5 text-[13px] font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring fg-press",
                   selected
                     ? "border-transparent bg-foreground text-background shadow-soft"
-                    : "border-border/70 bg-surface/80 text-muted-foreground hover:bg-surface hover:text-foreground dark:border-white/[0.06] dark:bg-secondary/50"
+                    : "border-border/70 bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground"
                 )}
               >
                 <Icon className="h-5 w-5" aria-hidden="true" />

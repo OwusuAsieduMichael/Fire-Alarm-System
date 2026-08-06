@@ -22,13 +22,14 @@ export default function ProfilePage() {
   }, [user?.name, user?.phone]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Account"
         title="Profile"
         description="Manage your FireGuard operator identity."
       />
 
-      <Card className="max-w-xl border-border/55">
+      <Card className="max-w-xl">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
           <div>
             <p className="metric-label">Operator</p>

@@ -28,8 +28,9 @@ export default function ControlsPage() {
   const buzzer = useBuzzerControl();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Actions"
         title="Controls"
         description="Send confirmed commands to the ESP32. Every action asks for confirmation."
         actions={

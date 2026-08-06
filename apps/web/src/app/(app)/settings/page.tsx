@@ -22,8 +22,9 @@ export default function SettingsPage() {
     Boolean(user?.id && selected?.ownerId && selected.ownerId === user.id);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Preferences"
         title="Settings"
         description="Appearance, thresholds, calibration, and device configuration."
       />

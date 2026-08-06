@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
+import { listItemFade } from "@/lib/motion";
 import { useDeviceStore } from "@/stores/device-store";
 import type { Alert, AlertSeverity } from "@/types";
 import { cn } from "@/lib/utils";
@@ -29,12 +30,9 @@ function AlertItem({ alert }: { alert: Alert }) {
   return (
     <motion.li
       layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ type: "spring", stiffness: 320, damping: 28 }}
+      {...listItemFade}
       className={cn(
-        "rounded-[1.1rem] border border-border/65 bg-surface/70 p-3.5 transition-colors hover:bg-surface dark:border-white/[0.06] dark:bg-secondary/40 dark:hover:bg-secondary/70",
+        "rounded-[1.1rem] border border-border/60 bg-secondary/40 p-3.5 transition-colors hover:bg-secondary/70",
         !alert.acknowledged && "border-l-[3px] border-l-ember"
       )}
     >
@@ -75,7 +73,7 @@ export function RecentAlerts({ loading, limit = 6 }: RecentAlertsProps) {
             icon={<BellRing className="h-5 w-5" />}
             title="No recent alerts"
             description="The system is quiet. New fire, smoke, and SMS events appear here."
-            className="border-0 bg-transparent py-10"
+            className="border-0 bg-transparent py-10 shadow-none"
           />
         ) : (
           <ul className="space-y-2.5">

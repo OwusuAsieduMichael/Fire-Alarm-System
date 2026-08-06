@@ -35,10 +35,11 @@ export default function DashboardPage() {
         : "safe";
 
   return (
-    <div className="space-y-9">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Overview"
         title="Home"
-        description="Is the building safe? What needs attention? Is the device healthy?"
+        description="Building safety, device health, and what needs attention."
         actions={<ConnectionBadge />}
       />
 

@@ -41,8 +41,9 @@ export default function NotificationsPage() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <PageHeader
+        eyebrow="Inbox"
         title="Notifications"
         description="Review fire, smoke, and SMS events. Acknowledge when handled."
         actions={

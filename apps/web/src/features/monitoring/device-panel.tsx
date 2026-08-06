@@ -23,7 +23,7 @@ function Row({
   value: string;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-border/55 bg-surface-elevated/50 px-3.5 py-3 transition-colors hover:bg-muted/35">
+    <div className="flex items-start gap-3 rounded-2xl border border-border/60 bg-surface-elevated/60 px-3.5 py-3 transition-colors hover:bg-muted/40">
       <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-muted/80">
         <Icon className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
       </div>
@@ -43,7 +43,7 @@ export function DevicePanel({ device, loading }: DevicePanelProps) {
 
   if (loading) {
     return (
-      <Card className="border-border/55">
+      <Card>
         <CardHeader>
           <Skeleton className="h-5 w-40" />
         </CardHeader>
@@ -59,7 +59,7 @@ export function DevicePanel({ device, loading }: DevicePanelProps) {
   const lastSeen = device?.lastSeen || live.lastSeen;
 
   return (
-    <Card className="border-border/55">
+    <Card>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
         <div>
           <p className="metric-label">Node</p>

@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { CommandPalette } from "@/components/shared/command-palette";
+import { BottomNav } from "./bottom-nav";
 import { DashboardBackdrop } from "./dashboard-backdrop";
-import { MobileNav } from "./mobile-nav";
+import { MoreSheet } from "./more-sheet";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 
@@ -12,8 +13,8 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps) {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
   const [commandOpen, setCommandOpen] = React.useState(false);
+  const [moreOpen, setMoreOpen] = React.useState(false);
 
   return (
     <div className="flex min-h-dvh w-full bg-surface dark:bg-background">
@@ -25,17 +26,18 @@ export function AppShell({ children }: AppShellProps) {
         <DashboardBackdrop />
 
         <div className="relative z-10 flex min-h-dvh flex-1 flex-col">
-          <Topbar
-            onMenuClick={() => setMobileOpen(true)}
-            onSearchClick={() => setCommandOpen(true)}
-          />
-          <main className="workspace-canvas flex-1 px-4 py-7 sm:px-6 lg:px-10 lg:py-9">
+          <Topbar onSearchClick={() => setCommandOpen(true)} />
+          <main className="workspace-canvas safe-bottom-nav flex-1 px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto w-full max-w-[1080px]">{children}</div>
           </main>
         </div>
       </div>
 
-      <MobileNav open={mobileOpen} onOpenChange={setMobileOpen} />
+      <BottomNav
+        onMoreClick={() => setMoreOpen(true)}
+        moreActive={moreOpen}
+      />
+      <MoreSheet open={moreOpen} onOpenChange={setMoreOpen} />
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
     </div>
   );

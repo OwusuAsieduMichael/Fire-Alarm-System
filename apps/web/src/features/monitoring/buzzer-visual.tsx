@@ -11,7 +11,7 @@ export function BuzzerVisual() {
   const active = useDeviceStore((s) => s.live.buzzerActive);
 
   return (
-    <Card className="border-border/55">
+    <Card>
       <CardHeader className="pb-3">
         <p className="metric-label">Actuator</p>
         <CardTitle className="mt-1.5 text-lg">Buzzer</CardTitle>

@@ -15,6 +15,7 @@ import {
 import { BrandLogo } from "@/components/shared/brand-logo";
 import { ConnectionBadge } from "@/components/shared/connection-badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { springSoft } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth-store";
 import type { UserRole } from "@/types";
@@ -76,17 +77,19 @@ function NavLink({
         "relative flex items-center gap-2.5 rounded-[12px] px-3 py-[9px] text-[13px] font-medium transition-colors duration-200",
         active
           ? "text-foreground"
-          : "text-muted-foreground hover:bg-foreground/[0.05] hover:text-foreground"
+          : "text-muted-foreground hover:text-foreground"
       )}
       aria-current={active ? "page" : undefined}
     >
       {active ? (
         <motion.span
           layoutId="sidebar-active"
-          className="absolute inset-0 rounded-[12px] border border-border/80 bg-card shadow-soft dark:border-white/[0.08] dark:bg-white/[0.08]"
-          transition={{ type: "spring", stiffness: 440, damping: 36 }}
+          className="absolute inset-0 rounded-[12px] bg-card shadow-soft ring-1 ring-border/60"
+          transition={springSoft}
         />
-      ) : null}
+      ) : (
+        <span className="absolute inset-0 rounded-[12px] opacity-0 transition-opacity hover:bg-foreground/[0.04] hover:opacity-100 dark:hover:bg-white/[0.05]" />
+      )}
       <Icon
         className={cn(
           "relative z-10 h-[17px] w-[17px] shrink-0 transition-opacity",
@@ -111,7 +114,7 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full w-[248px] flex-col border-r border-border/70 bg-surface/92 backdrop-blur-2xl dark:border-white/[0.06] dark:bg-[#0B0B0F]/80",
+        "flex h-full w-[248px] flex-col border-r border-border/60 bg-surface/90 backdrop-blur-2xl dark:bg-surface/80",
         className
       )}
     >
@@ -171,8 +174,8 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
         </nav>
       </ScrollArea>
 
-      <div className="border-t border-border/70 p-3 dark:border-white/[0.06]">
-        <div className="rounded-[12px] border border-border/50 bg-card/70 px-3 py-2.5 dark:border-transparent dark:bg-white/[0.04]">
+      <div className="border-t border-border/60 p-3">
+        <div className="rounded-[12px] border border-border/50 bg-card/80 px-3 py-2.5">
           <p className="truncate text-[13px] font-medium tracking-tight">
             {user?.name ?? "Operator"}
           </p>

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { LiveValue } from "@/components/shared/live-value";
+import { staggerChild } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 interface SensorCardProps {
@@ -28,8 +29,8 @@ const toneIcon: Record<string, string> = {
 
 const toneBorder: Record<string, string> = {
   safe: "",
-  alarm: "border-ember/20",
-  warning: "border-warning/20",
+  alarm: "border-ember/25",
+  warning: "border-warning/25",
   info: "",
 };
 
@@ -47,20 +48,14 @@ export function SensorCard({
 }: SensorCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        delay: index * 0.04,
-        duration: 0.35,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      {...staggerChild(index)}
       className={cn(featured && "sm:col-span-2 xl:col-span-1", className)}
     >
       <Card
         interactive
         className={cn("group h-full", toneBorder[statusTone])}
       >
-        <CardContent className="flex h-full flex-col gap-6 p-5 sm:p-6">
+        <CardContent className="flex h-full flex-col gap-5 p-5 sm:p-6">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
               <p className="metric-label">{title}</p>
@@ -80,7 +75,7 @@ export function SensorCard({
             </div>
             <div
               className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-[14px] transition-transform duration-300 group-hover:scale-105",
+                "flex h-10 w-10 items-center justify-center rounded-[14px] transition-transform duration-300 group-hover:scale-[1.04]",
                 toneIcon[statusTone]
               )}
             >

@@ -3,7 +3,6 @@
 import { useTheme } from "next-themes";
 import {
   LogOut,
-  Menu,
   Moon,
   Search,
   Sun,
@@ -30,11 +29,10 @@ const titles: Record<string, string> = Object.fromEntries(
 );
 
 interface TopbarProps {
-  onMenuClick?: () => void;
   onSearchClick?: () => void;
 }
 
-export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
+export function Topbar({ onSearchClick }: TopbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -46,17 +44,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
     "FireGuard";
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/70 bg-surface/70 px-4 backdrop-blur-2xl dark:border-white/[0.06] dark:bg-background/55 sm:px-6 lg:px-8">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="lg:hidden"
-        onClick={onMenuClick}
-        aria-label="Open navigation"
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
-
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-surface/85 px-4 backdrop-blur-2xl sm:px-6 lg:px-8">
       <div className="min-w-0 lg:hidden">
         <h1 className="truncate text-[15px] font-semibold tracking-tight">
           {title}
@@ -67,12 +55,12 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
         <button
           type="button"
           onClick={onSearchClick}
-          className="flex h-9 w-full items-center gap-2 rounded-full border border-border/80 bg-card/80 px-3.5 text-left text-[13px] text-muted-foreground shadow-soft transition-colors hover:bg-card dark:border-white/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.07]"
+          className="flex h-9 w-full items-center gap-2 rounded-full border border-border/70 bg-card/90 px-3.5 text-left text-[13px] text-muted-foreground shadow-soft transition-colors hover:bg-card"
           aria-label="Open command palette"
         >
           <Search className="h-3.5 w-3.5 shrink-0 opacity-70" />
           <span className="flex-1 truncate">Search</span>
-          <kbd className="rounded-md bg-foreground/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground dark:bg-white/[0.06]">
+          <kbd className="rounded-md bg-secondary px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
             ⌘K
           </kbd>
         </button>
@@ -96,7 +84,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full"
+          className="relative rounded-full"
           aria-label="Toggle theme"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
@@ -111,7 +99,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
               className="relative h-9 w-9 rounded-full p-0"
               aria-label="User menu"
             >
-              <Avatar className="h-8 w-8 border border-border/80 dark:border-white/[0.08]">
+              <Avatar className="h-8 w-8 border border-border/70">
                 <AvatarFallback className="bg-secondary text-xs font-semibold">
                   {initials(user?.name)}
                 </AvatarFallback>

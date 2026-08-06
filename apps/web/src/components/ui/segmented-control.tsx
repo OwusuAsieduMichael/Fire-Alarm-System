@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { springSoft } from "@/lib/motion";
 
 export interface SegmentOption<T extends string = string> {
   value: T;
@@ -28,7 +29,7 @@ export function SegmentedControl<T extends string = string>({
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        "inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-[14px] bg-black/[0.05] p-1 no-scrollbar dark:bg-white/[0.06]",
+        "inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-[14px] bg-secondary/80 p-1 no-scrollbar",
         className
       )}
     >
@@ -52,7 +53,7 @@ export function SegmentedControl<T extends string = string>({
               <motion.span
                 layoutId="segmented-pill"
                 className="absolute inset-0 -z-10 rounded-[11px] bg-card shadow-soft"
-                transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                transition={springSoft}
               />
             ) : null}
             <span className="relative z-10">{option.label}</span>

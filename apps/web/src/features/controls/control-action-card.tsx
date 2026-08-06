@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { staggerChild } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type ActionTone = "danger" | "warning" | "calm" | "neutral";
@@ -41,7 +42,7 @@ const toneStyles: Record<
   }
 > = {
   danger: {
-    card: "border-ember/25 hover:border-ember/40 hover:shadow-glow",
+    card: "border-ember/25 hover:border-ember/40",
     icon: "bg-ember/12 text-ember",
     button: "ember",
   },
@@ -56,8 +57,8 @@ const toneStyles: Record<
     button: "secondary",
   },
   neutral: {
-    card: "border-border/55 hover:border-border",
-    icon: "bg-muted/80 text-muted-foreground",
+    card: "border-border/70 hover:border-border",
+    icon: "bg-muted text-muted-foreground",
     button: "outline",
   },
 };
@@ -85,49 +86,42 @@ export function ControlActionCard({
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Card
-          interactive
-          className={cn("h-full", styles.card)}
-        >
-          <CardContent className="flex h-full flex-col gap-5 p-6 sm:p-7">
+      <motion.div {...staggerChild(index)}>
+        <Card interactive className={cn("h-full", styles.card)}>
+          <CardContent className="flex h-full flex-col gap-5 p-5 sm:p-6">
             <div
               className={cn(
                 "flex h-12 w-12 items-center justify-center rounded-2xl",
                 styles.icon
               )}
             >
-              <Icon className="h-6 w-6" aria-hidden="true" />
+              <Icon className="h-5 w-5" aria-hidden="true" />
             </div>
             <div className="flex-1 space-y-1.5">
-              <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+              <h3 className="text-[17px] font-semibold tracking-tight">
+                {title}
+              </h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {description}
               </p>
             </div>
-            <motion.div whileTap={{ scale: 0.98 }}>
-              <Button
-                variant={styles.button}
-                size="lg"
-                className="w-full"
-                disabled={disabled || loading}
-                onClick={() => setOpen(true)}
-                aria-label={title}
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="animate-spin" />
-                    Working…
-                  </>
-                ) : (
-                  title
-                )}
-              </Button>
-            </motion.div>
+            <Button
+              variant={styles.button}
+              size="lg"
+              className="w-full"
+              disabled={disabled || loading}
+              onClick={() => setOpen(true)}
+              aria-label={title}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Working…
+                </>
+              ) : (
+                title
+              )}
+            </Button>
           </CardContent>
         </Card>
       </motion.div>
