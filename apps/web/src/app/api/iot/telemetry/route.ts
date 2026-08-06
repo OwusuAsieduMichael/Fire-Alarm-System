@@ -1,5 +1,6 @@
 import { error, json } from "@/server/http";
 import { ingestTelemetry, pullCommands } from "@/server/iot";
+import { pruneRateLimitBuckets, rateLimit } from "@/server/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -9,6 +10,8 @@ export const runtime = "nodejs";
  * Body: { smokeLevel, flameDetected, temperature?, humidity?, ... }
  */
 export async function POST(req: Request) {
+  pruneRateLimitBuckets();
+
   const deviceKey =
     req.headers.get("x-device-key") ||
     req.headers.get("X-Device-Key") ||
@@ -29,6 +32,11 @@ export async function POST(req: Request) {
 
   if (!key) {
     return error("Missing device key (x-device-key header or deviceKey)", 401);
+  }
+
+  const limited = rateLimit(`telemetry:${key}`, 45, 60_000);
+  if (!limited.ok) {
+    return error(`Telemetry rate limit. Retry in ${limited.retryAfterSec}s`, 429);
   }
 
   if (typeof body.smokeLevel !== "number") {
@@ -71,6 +79,11 @@ export async function GET(req: Request) {
 
   if (!deviceKey) {
     return error("Missing device key", 401);
+  }
+
+  const limited = rateLimit(`commands:${deviceKey}`, 40, 60_000);
+  if (!limited.ok) {
+    return error(`Command poll rate limit. Retry in ${limited.retryAfterSec}s`, 429);
   }
 
   const result = await pullCommands(deviceKey);

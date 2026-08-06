@@ -3,6 +3,7 @@
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusPill } from "@/components/shared/status-pill";
+import { RegisterDeviceCard } from "@/features/settings/register-device-card";
 import { ThemeSettings } from "@/features/settings/theme-settings";
 import { ThresholdControl } from "@/features/settings/threshold-control";
 import { useDevices } from "@/hooks/use-sensors";
@@ -13,10 +14,12 @@ import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
 export default function SettingsPage() {
   useDevices();
   const user = useAuthStore((s) => s.user);
-  const canWrite = user?.role === "DEVELOPER";
   const selected = useDeviceStore(selectSelectedDevice);
   const live = useDeviceStore((s) => s.live);
   const updateDevice = useUpdateDeviceSettings();
+  const canWrite =
+    user?.role === "DEVELOPER" ||
+    Boolean(user?.id && selected?.ownerId && selected.ownerId === user.id);
 
   return (
     <div className="space-y-8">
@@ -26,6 +29,8 @@ export default function SettingsPage() {
       />
 
       <ThemeSettings />
+
+      <RegisterDeviceCard />
 
       <ThresholdControl
         smokeThreshold={selected?.smokeThreshold ?? 300}
@@ -73,7 +78,13 @@ export default function SettingsPage() {
             <Row label="Device key" value={selected?.deviceKey ?? "—"} mono />
             <Row
               label="Write access"
-              value={canWrite ? "Developer" : "Read-only"}
+              value={
+                canWrite
+                  ? user?.role === "DEVELOPER"
+                    ? "Developer"
+                    : "Owner"
+                  : "Read-only"
+              }
             />
           </CardContent>
         </Card>

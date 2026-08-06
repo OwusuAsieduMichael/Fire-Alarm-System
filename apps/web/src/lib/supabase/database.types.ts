@@ -45,6 +45,7 @@ export type Database = {
       devices: {
         Row: {
           id: string;
+          owner_id: string | null;
           name: string;
           device_key: string;
           status: "ONLINE" | "OFFLINE";
@@ -59,6 +60,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
+          owner_id?: string | null;
           name: string;
           device_key: string;
           status?: "ONLINE" | "OFFLINE";
@@ -73,6 +75,7 @@ export type Database = {
         };
         Update: {
           id?: string;
+          owner_id?: string | null;
           name?: string;
           device_key?: string;
           status?: "ONLINE" | "OFFLINE";
@@ -84,6 +87,27 @@ export type Database = {
           smoke_calibration?: number;
           created_at?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      device_members: {
+        Row: {
+          device_id: string;
+          user_id: string;
+          member_role: string;
+          created_at: string;
+        };
+        Insert: {
+          device_id: string;
+          user_id: string;
+          member_role?: string;
+          created_at?: string;
+        };
+        Update: {
+          device_id?: string;
+          user_id?: string;
+          member_role?: string;
+          created_at?: string;
         };
         Relationships: [];
       };

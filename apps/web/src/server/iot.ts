@@ -1,4 +1,5 @@
 import { adminDb, mapDevice, isFresh } from "./supabase-data";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { LiveDeviceState } from "@/types";
 
 export type ControlAction =
@@ -189,7 +190,8 @@ export async function ingestTelemetry(input: TelemetryInput) {
 /** Queue a control command for the ESP32 to poll. */
 export async function enqueueControl(
   action: ControlAction,
-  deviceId?: string
+  deviceId?: string,
+  access?: { userId: string; accessToken: string | null }
 ) {
   const db = adminDb();
   if (!db) {
@@ -214,8 +216,27 @@ export async function enqueueControl(
     return {
       ok: false as const,
       status: 404,
-      message: "No device registered. Add one in Supabase (devices table).",
+      message: "No device registered. Create one in Settings.",
     };
+  }
+
+  // Enforce account isolation when a user JWT is present
+  if (access?.userId && access.accessToken) {
+    const userClient = createSupabaseServerClient(access.accessToken);
+    if (userClient) {
+      const { data: allowed } = await userClient
+        .from("devices")
+        .select("id")
+        .eq("id", deviceRow.id)
+        .maybeSingle();
+      if (!allowed) {
+        return {
+          ok: false as const,
+          status: 403,
+          message: "You do not have access to this device.",
+        };
+      }
+    }
   }
 
   const { data: cmd, error: cmdError } = await db

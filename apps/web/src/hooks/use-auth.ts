@@ -3,6 +3,10 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import {
+  authErrorMessage,
+  isEmailNotConfirmedError,
+} from "@/lib/auth-errors";
 import { disconnectSocket } from "@/lib/socket";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -32,11 +36,6 @@ function requireSupabase() {
     throw new Error("Unable to initialize Supabase client.");
   }
   return client;
-}
-
-function authErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof Error && error.message) return error.message;
-  return fallback;
 }
 
 export function useAuth() {
@@ -77,14 +76,36 @@ export function useAuth() {
         router.replace("/dashboard");
         return { user: profile, accessToken: data.session.access_token };
       } catch (error) {
-        toast.error(
-          authErrorMessage(error, "Unable to sign in. Check your credentials.")
-        );
+        // Inline UI on the login form handles unconfirmed email.
+        if (!isEmailNotConfirmedError(error)) {
+          toast.error(
+            authErrorMessage(
+              error,
+              "Unable to sign in. Check your credentials."
+            )
+          );
+        }
         throw error;
       }
     },
     [setAuth, router]
   );
+
+  const resendConfirmationEmail = useCallback(async (email: string) => {
+    const client = requireSupabase();
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed) {
+      throw new Error("Enter your email address first.");
+    }
+
+    const { error } = await client.auth.resend({
+      type: "signup",
+      email: trimmed,
+    });
+
+    if (error) throw error;
+    return true;
+  }, []);
 
   const signUp = useCallback(
     async (input: SignUpInput) => {
@@ -114,10 +135,11 @@ export function useAuth() {
 
         // Email confirmation enabled → no session until confirmed
         if (!data.session) {
-          toast.success(
-            "Account created. Check your email to confirm, then sign in."
-          );
-          router.replace("/login");
+          const params = new URLSearchParams({
+            verify: "pending",
+            email,
+          });
+          router.replace(`/login?${params.toString()}`);
           return { needsConfirmation: true as const };
         }
 
@@ -171,6 +193,7 @@ export function useAuth() {
     isAuthenticated,
     login,
     signUp,
+    resendConfirmationEmail,
     logout,
     setUser: updateUser,
   };

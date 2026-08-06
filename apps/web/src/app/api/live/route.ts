@@ -1,4 +1,5 @@
-import { getBearer, error, isResponse, json, requireUser } from "@/server/http";
+import { NextResponse } from "next/server";
+import { getBearer, error, isResponse, requireUser } from "@/server/http";
 import {
   mapAlert,
   mapDevice,
@@ -7,31 +8,52 @@ import {
   toHistory,
   userDb,
 } from "@/server/supabase-data";
+import { rateLimit } from "@/server/rate-limit";
 
 export const runtime = "nodejs";
 
-/** Live telemetry from Supabase — stays OFFLINE until the ESP32 posts data. */
+/** Live telemetry from Supabase — scoped to the caller's devices. */
 export async function GET(req: Request) {
   const user = await requireUser(req);
   if (isResponse(user)) return user;
+
+  const limited = rateLimit(`live:${user.id}`, 60, 60_000);
+  if (!limited.ok) {
+    return error(`Too many live polls. Retry in ${limited.retryAfterSec}s`, 429);
+  }
 
   const token = getBearer(req);
   if (!token) return error("Unauthorized", 401);
   const db = userDb(token);
   if (!db) return error("Supabase is not configured", 503);
 
-  const { data: devices } = await db
+  const url = new URL(req.url);
+  const requestedId = url.searchParams.get("deviceId");
+
+  let deviceQuery = db
     .from("devices")
     .select("*")
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(1);
+  if (requestedId) {
+    deviceQuery = db.from("devices").select("*").eq("id", requestedId).limit(1);
+  }
 
+  const { data: devices } = await deviceQuery;
   const deviceRow = devices?.[0] ?? null;
   if (!deviceRow) {
-    return json({
-      live: offlineLive(null),
-      recentAlerts: [],
-      smokeHistory: [],
-    });
+    return NextResponse.json(
+      {
+        live: offlineLive(null),
+        recentAlerts: [],
+        smokeHistory: [],
+      },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=2",
+        },
+      }
+    );
   }
 
   const device = mapDevice(deviceRow);
@@ -54,6 +76,7 @@ export async function GET(req: Request) {
       db
         .from("alerts")
         .select("*")
+        .eq("device_id", device.id)
         .order("created_at", { ascending: false })
         .limit(20),
     ]);
@@ -74,15 +97,18 @@ export async function GET(req: Request) {
       }
     : null;
 
-  // Mark stale devices offline for the UI
   const live = readingToLive(device, reading);
-  if (live.status === "OFFLINE" && device.status === "ONLINE") {
-    // Display-only; ESP32 heartbeat will set ONLINE again
-  }
 
-  return json({
-    live,
-    recentAlerts: (alerts || []).map((a) => mapAlert(a, device.name)),
-    smokeHistory: toHistory(history || []),
-  });
+  return NextResponse.json(
+    {
+      live,
+      recentAlerts: (alerts || []).map((a) => mapAlert(a, device.name)),
+      smokeHistory: toHistory(history || []),
+    },
+    {
+      headers: {
+        "Cache-Control": "private, max-age=1",
+      },
+    }
+  );
 }

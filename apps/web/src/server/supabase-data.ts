@@ -29,6 +29,7 @@ export function mapDevice(row: DeviceRow, counts?: { alerts?: number; readings?:
     lastSeen: row.last_seen,
     smokeThreshold: row.smoke_threshold,
     smokeCalibration: row.smoke_calibration,
+    ownerId: row.owner_id ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     _count: counts

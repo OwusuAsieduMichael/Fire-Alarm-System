@@ -43,11 +43,12 @@ SUPABASE_SERVICE_ROLE_KEY=your-secret-key
 
 `SUPABASE_SERVICE_ROLE_KEY` is required for ESP32 ingest (`POST /api/iot/telemetry`).
 
-## 5. ESP32 contract
+## Multi-account + traffic
 
-- **Telemetry:** `POST /api/iot/telemetry`  
-  Header `x-device-key: FG-ESP32-DEMO-001`  
-  Body: `{ "smokeLevel": 120, "flameDetected": false, ... }`
-- **Commands:** `GET /api/iot/telemetry` with same header — returns queued controls
+- Unlimited self-serve signup via Supabase Auth (enable Email provider)
+- Each account only sees **its own devices** (RLS + `owner_id`)
+- Register hardware in **Settings → Register ESP32 device**
+- Live polling is adaptive (slower when offline / tab hidden)
+- Soft rate limits on live polls, controls, and ESP32 telemetry
 
-See `firmware/fireguard_esp32/fireguard_esp32.ino`.
+Run [`patch-multi-tenant.sql`](./patch-multi-tenant.sql) if your project already had the older open RLS policies.

@@ -24,6 +24,7 @@ export interface Device {
   lastSeen?: string | null;
   smokeThreshold: number;
   smokeCalibration: number;
+  ownerId?: string | null;
   createdAt?: string;
   updatedAt?: string;
   connectionLogs?: ConnectionLog[];

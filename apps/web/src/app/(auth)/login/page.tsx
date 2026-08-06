@@ -2,10 +2,16 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, UserRound } from "lucide-react";
 import { z } from "zod";
+import { EmailConfirmNotice } from "@/components/auth/email-confirm-notice";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  authErrorMessage,
+  isEmailNotConfirmedError,
+} from "@/lib/auth-errors";
 import { cn } from "@/lib/utils";
 
 const loginSchema = z.object({
@@ -14,9 +20,13 @@ const loginSchema = z.object({
 });
 
 const REMEMBER_KEY = "fireguard.rememberEmail";
+const RESEND_COOLDOWN_SEC = 60;
 
-export default function LoginPage() {
-  const { login } = useAuth();
+function LoginForm() {
+  const { login, resendConfirmationEmail } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
@@ -26,6 +36,14 @@ export default function LoginPage() {
     password?: string;
   }>({});
   const [loading, setLoading] = React.useState(false);
+
+  const [confirmNotice, setConfirmNotice] = React.useState<
+    null | "pending" | "blocked"
+  >(null);
+  const [resending, setResending] = React.useState(false);
+  const [cooldown, setCooldown] = React.useState(0);
+  const [resendMessage, setResendMessage] = React.useState<string | null>(null);
+  const [resendError, setResendError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     try {
@@ -39,9 +57,60 @@ export default function LoginPage() {
     }
   }, []);
 
+  React.useEffect(() => {
+    const verify = searchParams.get("verify");
+    const emailParam = searchParams.get("email");
+    if (verify === "pending") {
+      setConfirmNotice("pending");
+      if (emailParam) setEmail(emailParam);
+      router.replace("/login", { scroll: false });
+    }
+  }, [searchParams, router]);
+
+  React.useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = window.setInterval(() => {
+      setCooldown((s) => (s <= 1 ? 0 : s - 1));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [cooldown]);
+
+  const onResend = async () => {
+    setResendMessage(null);
+    setResendError(null);
+
+    const trimmed = email.trim();
+    if (!trimmed) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "Enter your email to resend the confirmation link",
+      }));
+      return;
+    }
+
+    setResending(true);
+    try {
+      await resendConfirmationEmail(trimmed);
+      setResendMessage("Confirmation email sent. Check your inbox and spam folder.");
+      setCooldown(RESEND_COOLDOWN_SEC);
+      if (confirmNotice !== "pending") setConfirmNotice("blocked");
+    } catch (error) {
+      setResendError(
+        authErrorMessage(
+          error,
+          "Could not resend confirmation email. Try again shortly."
+        )
+      );
+    } finally {
+      setResending(false);
+    }
+  };
+
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setErrors({});
+    setResendMessage(null);
+    setResendError(null);
 
     const parsed = loginSchema.safeParse({ email, password });
     if (!parsed.success) {
@@ -65,8 +134,11 @@ export default function LoginPage() {
         // ignore
       }
       await login(parsed.data.email, parsed.data.password);
-    } catch {
-      // toast handled in useAuth
+      setConfirmNotice(null);
+    } catch (error) {
+      if (isEmailNotConfirmedError(error)) {
+        setConfirmNotice("blocked");
+      }
     } finally {
       setLoading(false);
     }
@@ -80,6 +152,18 @@ export default function LoginPage() {
           Welcome back — sign in with your email and password.
         </p>
       </div>
+
+      {confirmNotice ? (
+        <EmailConfirmNotice
+          email={email.trim()}
+          variant={confirmNotice}
+          resending={resending}
+          cooldownSeconds={cooldown}
+          resendMessage={resendMessage}
+          resendError={resendError}
+          onResend={onResend}
+        />
+      ) : null}
 
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <div className="space-y-1.5">
@@ -134,7 +218,9 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? "password-error" : undefined}
+              aria-describedby={
+                errors.password ? "password-error" : undefined
+              }
               className={cn(
                 "auth-glass-input w-full pr-11",
                 errors.password && "border-red-300/80"
@@ -219,5 +305,20 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="space-y-3 text-white">
+          <h1 className="text-3xl font-semibold tracking-tight">Login</h1>
+          <p className="text-sm text-white/70">Loading…</p>
+        </div>
+      }
+    >
+      <LoginForm />
+    </React.Suspense>
   );
 }
