@@ -46,7 +46,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
     "FireGuard";
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/50 bg-background/80 px-4 backdrop-blur-xl sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-black/[0.05] bg-background/72 px-4 backdrop-blur-2xl dark:border-white/[0.06] sm:px-6 lg:px-8">
       <Button
         variant="ghost"
         size="icon"
@@ -58,27 +58,27 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
       </Button>
 
       <div className="min-w-0 lg:hidden">
-        <h1 className="truncate text-sm font-semibold tracking-tight">
+        <h1 className="truncate text-[15px] font-semibold tracking-tight">
           {title}
         </h1>
       </div>
 
-      <div className="mx-auto hidden w-full max-w-md flex-1 md:block lg:absolute lg:left-1/2 lg:max-w-lg lg:-translate-x-1/2">
+      <div className="mx-auto hidden w-full max-w-md flex-1 md:block lg:absolute lg:left-1/2 lg:max-w-md lg:-translate-x-1/2">
         <button
           type="button"
           onClick={onSearchClick}
-          className="flex h-9 w-full items-center gap-2 rounded-xl border border-border/60 bg-card/80 px-3 text-left text-sm text-muted-foreground shadow-sm transition-colors hover:bg-muted/60"
+          className="flex h-9 w-full items-center gap-2 rounded-full border border-black/[0.06] bg-black/[0.03] px-3.5 text-left text-[13px] text-muted-foreground transition-colors hover:bg-black/[0.05] dark:border-white/[0.08] dark:bg-white/[0.04] dark:hover:bg-white/[0.07]"
           aria-label="Open command palette"
         >
-          <Search className="h-3.5 w-3.5 shrink-0" />
-          <span className="flex-1 truncate">Search pages and actions…</span>
-          <kbd className="rounded-md border border-border/70 bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+          <Search className="h-3.5 w-3.5 shrink-0 opacity-70" />
+          <span className="flex-1 truncate">Search</span>
+          <kbd className="rounded-md bg-black/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground dark:bg-white/[0.06]">
             ⌘K
           </kbd>
         </button>
       </div>
 
-      <div className="ml-auto flex items-center gap-1.5">
+      <div className="ml-auto flex items-center gap-1">
         <div className="hidden sm:block">
           <ConnectionBadge compact />
         </div>
@@ -96,6 +96,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
         <Button
           variant="ghost"
           size="icon"
+          className="rounded-full"
           aria-label="Toggle theme"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
@@ -110,16 +111,16 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
               className="relative h-9 w-9 rounded-full p-0"
               aria-label="User menu"
             >
-              <Avatar className="h-8 w-8 border border-border/60">
-                <AvatarFallback className="bg-muted text-xs font-semibold">
+              <Avatar className="h-8 w-8 border border-black/[0.06] dark:border-white/[0.08]">
+                <AvatarFallback className="bg-secondary text-xs font-semibold">
                   {initials(user?.name)}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-2xl">
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl p-1.5">
             <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
+              <div className="flex flex-col space-y-0.5 px-1 py-0.5">
                 <p className="text-sm font-medium">{user?.name ?? "User"}</p>
                 <p className="text-xs text-muted-foreground">
                   {user?.email ?? "—"}

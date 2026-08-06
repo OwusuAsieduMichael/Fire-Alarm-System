@@ -46,12 +46,12 @@ export function ThresholdControl({
   return (
     <TooltipProvider>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-border/55">
+        <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-2">
               <div>
                 <p className="metric-label">Detection</p>
-                <CardTitle className="mt-1.5 text-lg">Smoke threshold</CardTitle>
+                <CardTitle className="mt-1.5">Smoke threshold</CardTitle>
               </div>
               {!canWrite ? (
                 <Tooltip>
@@ -111,12 +111,12 @@ export function ThresholdControl({
           </CardContent>
         </Card>
 
-        <Card className="border-border/55">
+        <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-2">
               <div>
                 <p className="metric-label">Sensor</p>
-                <CardTitle className="mt-1.5 text-lg">Calibration</CardTitle>
+                <CardTitle className="mt-1.5">Calibration</CardTitle>
               </div>
               {!canWrite ? (
                 <Tooltip>

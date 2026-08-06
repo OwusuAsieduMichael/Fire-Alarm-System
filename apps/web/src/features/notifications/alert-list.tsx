@@ -73,7 +73,7 @@ export function AlertList({
               delay: Math.min(index * 0.03, 0.2),
             }}
             className={cn(
-              "rounded-[1.25rem] border border-border/55 border-l-[3px] p-4 shadow-soft transition-shadow hover:shadow-elevated sm:p-5",
+              "rounded-[1.25rem] border border-black/[0.04] border-l-[3px] bg-card p-4 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated dark:border-white/[0.06] sm:p-5",
               severityStyles[alert.severity],
               alert.acknowledged && "opacity-65"
             )}

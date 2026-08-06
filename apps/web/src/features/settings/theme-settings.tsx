@@ -15,12 +15,12 @@ export function ThemeSettings() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <Card className="border-border/55">
+    <Card>
       <CardHeader className="pb-3">
         <p className="metric-label">Appearance</p>
-        <CardTitle className="mt-1.5 text-lg">Theme</CardTitle>
-        <p className="text-xs text-muted-foreground">
-          Prefer light, dark, or match your system appearance.
+        <CardTitle className="mt-1.5">Theme</CardTitle>
+        <p className="text-[13px] text-muted-foreground">
+          Prefer light, dark, or match your system.
         </p>
       </CardHeader>
       <CardContent>
@@ -39,10 +39,10 @@ export function ThemeSettings() {
                 aria-checked={selected}
                 onClick={() => setTheme(value)}
                 className={cn(
-                  "flex flex-col items-center gap-2 rounded-2xl border px-3 py-4 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "flex flex-col items-center gap-2.5 rounded-[1.1rem] border px-3 py-5 text-[13px] font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   selected
-                    ? "border-foreground/20 bg-foreground text-background shadow-soft"
-                    : "border-border/55 bg-card text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                    ? "border-transparent bg-foreground text-background shadow-soft"
+                    : "border-black/[0.05] bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground dark:border-white/[0.06]"
                 )}
               >
                 <Icon className="h-5 w-5" aria-hidden="true" />

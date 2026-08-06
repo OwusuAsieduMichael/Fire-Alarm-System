@@ -19,18 +19,18 @@ interface SensorCardProps {
   featured?: boolean;
 }
 
-const toneRing: Record<string, string> = {
-  safe: "hover:border-success/25",
-  alarm: "border-ember/25 hover:border-ember/40",
-  warning: "hover:border-warning/30",
-  info: "hover:border-border",
-};
-
 const toneIcon: Record<string, string> = {
   safe: "bg-success/10 text-success",
   alarm: "bg-ember/10 text-ember",
   warning: "bg-warning/10 text-warning",
   info: "bg-info/10 text-info",
+};
+
+const toneBorder: Record<string, string> = {
+  safe: "",
+  alarm: "border-ember/20",
+  warning: "border-warning/20",
+  info: "",
 };
 
 export function SensorCard({
@@ -47,25 +47,27 @@ export function SensorCard({
 }: SensorCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        delay: index * 0.04,
+        duration: 0.35,
+        ease: [0.22, 1, 0.36, 1],
+      }}
       className={cn(featured && "sm:col-span-2 xl:col-span-1", className)}
     >
       <Card
-        className={cn(
-          "group h-full border-border/55 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated",
-          toneRing[statusTone]
-        )}
+        interactive
+        className={cn("group h-full", toneBorder[statusTone])}
       >
-        <CardContent className="flex h-full flex-col gap-5 p-5 sm:p-6">
+        <CardContent className="flex h-full flex-col gap-6 p-5 sm:p-6">
           <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <p className="metric-label">{title}</p>
               {statusLabel ? (
                 <p
                   className={cn(
-                    "text-xs font-semibold",
+                    "text-[12px] font-semibold",
                     statusTone === "safe" && "text-success",
                     statusTone === "alarm" && "text-ember",
                     statusTone === "warning" && "text-warning",
@@ -78,11 +80,11 @@ export function SensorCard({
             </div>
             <div
               className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-2xl transition-transform duration-200 group-hover:scale-105",
+                "flex h-10 w-10 items-center justify-center rounded-[14px] transition-transform duration-300 group-hover:scale-105",
                 toneIcon[statusTone]
               )}
             >
-              <Icon className="h-4.5 w-4.5 h-4 w-4" aria-hidden="true" />
+              <Icon className="h-4 w-4" aria-hidden="true" />
             </div>
           </div>
 
@@ -91,10 +93,10 @@ export function SensorCard({
               value={value}
               decimals={decimals}
               unit={unit}
-              className="text-[1.75rem] font-semibold tracking-tight"
+              className="text-[1.85rem] font-semibold tracking-[-0.03em]"
             />
           ) : (
-            <span className="text-[1.75rem] font-semibold tracking-tight">
+            <span className="text-[1.85rem] font-semibold tracking-[-0.03em]">
               {statusLabel}
             </span>
           )}

@@ -19,11 +19,10 @@ export default function SettingsPage() {
   const updateDevice = useUpdateDeviceSettings();
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-8">
       <PageHeader
-        eyebrow="Configuration"
         title="Settings"
-        description="Thresholds, calibration, theme, and system configuration."
+        description="Appearance, thresholds, calibration, and device configuration."
       />
 
       <ThemeSettings />
@@ -40,10 +39,10 @@ export default function SettingsPage() {
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-border/55">
+        <Card>
           <CardHeader className="pb-3">
             <p className="metric-label">Network</p>
-            <CardTitle className="mt-1.5 text-lg">Wi‑Fi status</CardTitle>
+            <CardTitle className="mt-1.5">Wi‑Fi status</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1 text-sm">
             <Row label="SSID" value={selected?.wifiSsid ?? "—"} />
@@ -59,10 +58,10 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border/55">
+        <Card>
           <CardHeader className="pb-3">
             <p className="metric-label">System</p>
-            <CardTitle className="mt-1.5 text-lg">Configuration</CardTitle>
+            <CardTitle className="mt-1.5">Configuration</CardTitle>
           </CardHeader>
           <CardContent className="space-y-1 text-sm">
             <Row label="Device" value={selected?.name ?? "—"} />

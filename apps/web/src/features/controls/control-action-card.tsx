@@ -91,12 +91,10 @@ export function ControlActionCard({
         transition={{ delay: index * 0.05, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         <Card
-          className={cn(
-            "h-full border-border/55 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elevated",
-            styles.card
-          )}
+          interactive
+          className={cn("h-full", styles.card)}
         >
-          <CardContent className="flex h-full flex-col gap-5 p-6">
+          <CardContent className="flex h-full flex-col gap-5 p-6 sm:p-7">
             <div
               className={cn(
                 "flex h-12 w-12 items-center justify-center rounded-2xl",

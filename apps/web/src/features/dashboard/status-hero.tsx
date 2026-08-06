@@ -17,43 +17,47 @@ export function StatusHero() {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "overflow-hidden rounded-[1.35rem] border border-border/55 bg-card shadow-elevated",
-        isAlarm && "border-ember/35 shadow-glow"
+        "overflow-hidden rounded-[1.5rem] border border-black/[0.04] bg-card shadow-elevated dark:border-white/[0.06]",
+        isAlarm && "border-ember/30 shadow-glow"
       )}
       aria-label="System status overview"
     >
       <div
         className={cn(
-          "border-b border-border/50 px-5 py-4 sm:px-6",
+          "px-6 py-5 sm:px-8 sm:py-6",
           isAlarm
-            ? "bg-gradient-to-r from-ember/12 via-card to-card"
-            : "bg-gradient-to-r from-success/10 via-card to-card"
+            ? "bg-gradient-to-br from-ember/[0.08] via-card to-card"
+            : "bg-gradient-to-br from-success/[0.07] via-card to-card"
         )}
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="metric-label">Operations overview</p>
-            <p className="mt-1 text-lg font-semibold tracking-tight">
-              {isAlarm ? "Attention required" : "All systems nominal"}
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-1.5">
+            <p className="metric-label">Building status</p>
+            <h2 className="text-[1.65rem] font-semibold tracking-[-0.03em] sm:text-[1.85rem]">
+              {isAlarm ? "Attention required" : "All clear"}
+            </h2>
+            <p className="max-w-md text-[14px] text-muted-foreground">
+              {isAlarm
+                ? "A fire or smoke condition needs immediate review."
+                : "Sensors and device health are within normal range."}
             </p>
           </div>
           <StatusPill
             label={isAlarm ? "ALARM" : "SAFE"}
             tone={isAlarm ? "alarm" : "safe"}
             pulse
-            className="text-xs"
           />
         </div>
       </div>
 
-      <div className="grid gap-px bg-border/40 sm:grid-cols-3">
-        <div className="flex flex-col gap-3 bg-card p-5 sm:p-6">
+      <div className="grid gap-px bg-black/[0.04] dark:bg-white/[0.06] sm:grid-cols-3">
+        <div className="flex flex-col gap-3.5 bg-card px-6 py-5 sm:px-7 sm:py-6">
           <div className="flex items-center justify-between">
-            <span className="metric-label">Fire status</span>
+            <span className="metric-label">Fire</span>
             <Flame
               className={cn(
                 "h-4 w-4",
@@ -61,40 +65,38 @@ export function StatusHero() {
               )}
             />
           </div>
-          <p className="text-2xl font-semibold tracking-tight">
+          <p className="text-[1.5rem] font-semibold tracking-tight">
             {isAlarm ? "Alarm" : "Safe"}
           </p>
-          <p className="text-sm text-muted-foreground">
-            {isAlarm
-              ? "Immediate attention required"
-              : "Sensors within safe range"}
+          <p className="text-[13px] text-muted-foreground">
+            {isAlarm ? "Immediate attention" : "Within safe range"}
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 bg-card p-5 sm:p-6">
+        <div className="flex flex-col gap-3.5 bg-card px-6 py-5 sm:px-7 sm:py-6">
           <div className="flex items-center justify-between">
-            <span className="metric-label">ESP32</span>
+            <span className="metric-label">Device</span>
             <Radio className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-2xl font-semibold tracking-tight">
-            {online ? "Online" : "Offline"}
+          <p className="text-[1.5rem] font-semibold tracking-tight">
+            {online ? "Healthy" : "Offline"}
           </p>
           <ConnectionBadge status={connectionStatus} />
         </div>
 
-        <div className="flex flex-col gap-3 bg-card p-5 sm:p-6">
+        <div className="flex flex-col gap-3.5 bg-card px-6 py-5 sm:px-7 sm:py-6">
           <div className="flex items-center justify-between">
-            <span className="metric-label">Smoke level</span>
+            <span className="metric-label">Smoke</span>
             <Wind className="h-4 w-4 text-muted-foreground" />
           </div>
           <LiveValue
             value={live.smokeLevel}
             unit="ppm"
             decimals={0}
-            className="text-2xl font-semibold tracking-tight"
+            className="text-[1.5rem] font-semibold tracking-tight"
           />
           <div
-            className="h-1.5 overflow-hidden rounded-full bg-muted"
+            className="h-1.5 overflow-hidden rounded-full bg-secondary"
             role="progressbar"
             aria-valuenow={live.smokeLevel}
             aria-valuemin={0}
@@ -112,7 +114,7 @@ export function StatusHero() {
               )}
               initial={false}
               animate={{ width: `${smokePct}%` }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              transition={{ type: "spring", stiffness: 120, damping: 22 }}
             />
           </div>
         </div>

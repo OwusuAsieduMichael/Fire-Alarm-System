@@ -16,17 +16,17 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="flex min-h-dvh w-full bg-background">
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-20 lg:flex lg:w-[244px] lg:flex-col">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-20 lg:flex lg:w-[248px] lg:flex-col">
         <Sidebar />
       </div>
 
-      <div className="flex min-h-dvh flex-1 flex-col lg:pl-[244px]">
+      <div className="flex min-h-dvh flex-1 flex-col lg:pl-[248px]">
         <Topbar
           onMenuClick={() => setMobileOpen(true)}
           onSearchClick={() => setCommandOpen(true)}
         />
-        <main className="workspace-canvas flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <div className="mx-auto w-full max-w-6xl">{children}</div>
+        <main className="workspace-canvas flex-1 px-4 py-7 sm:px-6 lg:px-10 lg:py-9">
+          <div className="mx-auto w-full max-w-[1080px]">{children}</div>
         </main>
       </div>
 

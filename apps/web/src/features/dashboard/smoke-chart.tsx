@@ -42,12 +42,12 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.12, duration: 0.4 }}
     >
-      <Card className="h-full border-border/55">
+      <Card className="h-full">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
           <div>
             <p className="metric-label">Trend</p>
-            <CardTitle className="mt-1.5 text-lg">Smoke history</CardTitle>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <CardTitle className="mt-1.5">Smoke history</CardTitle>
+            <p className="mt-1.5 text-[13px] text-muted-foreground">
               Live readings · threshold {threshold} ppm
             </p>
           </div>

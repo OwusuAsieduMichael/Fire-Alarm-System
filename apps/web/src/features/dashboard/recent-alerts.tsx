@@ -34,7 +34,7 @@ function AlertItem({ alert }: { alert: Alert }) {
       exit={{ opacity: 0, y: -8 }}
       transition={{ type: "spring", stiffness: 320, damping: 28 }}
       className={cn(
-        "rounded-2xl border border-border/55 bg-surface-elevated/50 p-3.5 transition-colors hover:bg-muted/40",
+        "rounded-[1.1rem] border border-black/[0.04] bg-secondary/40 p-3.5 transition-colors hover:bg-secondary/70 dark:border-white/[0.06]",
         !alert.acknowledged && "border-l-[3px] border-l-ember"
       )}
     >
@@ -58,10 +58,10 @@ export function RecentAlerts({ loading, limit = 6 }: RecentAlertsProps) {
   const alerts = useDeviceStore((s) => s.recentAlerts).slice(0, limit);
 
   return (
-    <Card className="h-full border-border/55">
+    <Card className="h-full">
       <CardHeader className="pb-3">
         <p className="metric-label">Inbox</p>
-        <CardTitle className="mt-1.5 text-lg">Recent alerts</CardTitle>
+        <CardTitle className="mt-1.5">Recent alerts</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (

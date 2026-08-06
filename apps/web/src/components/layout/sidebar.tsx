@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Bell,
-  Flame,
   Gauge,
   LayoutDashboard,
   Settings,
@@ -13,6 +12,7 @@ import {
   Terminal,
   UserRound,
 } from "lucide-react";
+import { BrandLogo } from "@/components/shared/brand-logo";
 import { ConnectionBadge } from "@/components/shared/connection-badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -24,26 +24,78 @@ export interface SidebarNavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   roles?: UserRole[];
+  group?: "monitor" | "system";
 }
 
 export const SIDEBAR_NAV: SidebarNavItem[] = [
-  { title: "Home", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Monitoring", href: "/monitoring", icon: Gauge },
-  { title: "Controls", href: "/controls", icon: SlidersHorizontal },
-  { title: "Notifications", href: "/notifications", icon: Bell },
-  { title: "Settings", href: "/settings", icon: Settings },
+  { title: "Home", href: "/dashboard", icon: LayoutDashboard, group: "monitor" },
+  { title: "Monitoring", href: "/monitoring", icon: Gauge, group: "monitor" },
+  {
+    title: "Controls",
+    href: "/controls",
+    icon: SlidersHorizontal,
+    group: "monitor",
+  },
+  {
+    title: "Notifications",
+    href: "/notifications",
+    icon: Bell,
+    group: "monitor",
+  },
+  { title: "Settings", href: "/settings", icon: Settings, group: "system" },
   {
     title: "Developer",
     href: "/developer",
     icon: Terminal,
     roles: ["DEVELOPER"],
+    group: "system",
   },
-  { title: "Profile", href: "/profile", icon: UserRound },
+  { title: "Profile", href: "/profile", icon: UserRound, group: "system" },
 ];
 
 interface SidebarProps {
   onNavigate?: () => void;
   className?: string;
+}
+
+function NavLink({
+  item,
+  active,
+  onNavigate,
+}: {
+  item: SidebarNavItem;
+  active: boolean;
+  onNavigate?: () => void;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      className={cn(
+        "relative flex items-center gap-2.5 rounded-[12px] px-3 py-[9px] text-[13px] font-medium transition-colors duration-200",
+        active
+          ? "text-foreground"
+          : "text-muted-foreground hover:bg-black/[0.04] hover:text-foreground dark:hover:bg-white/[0.05]"
+      )}
+      aria-current={active ? "page" : undefined}
+    >
+      {active ? (
+        <motion.span
+          layoutId="sidebar-active"
+          className="absolute inset-0 rounded-[12px] bg-white shadow-soft dark:bg-white/[0.08]"
+          transition={{ type: "spring", stiffness: 440, damping: 36 }}
+        />
+      ) : null}
+      <Icon
+        className={cn(
+          "relative z-10 h-[17px] w-[17px] shrink-0 transition-opacity",
+          active ? "opacity-100" : "opacity-70"
+        )}
+      />
+      <span className="relative z-10">{item.title}</span>
+    </Link>
+  );
 }
 
 export function Sidebar({ onNavigate, className }: SidebarProps) {
@@ -53,20 +105,22 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
   const items = SIDEBAR_NAV.filter(
     (item) => !item.roles || (user?.role && item.roles.includes(user.role))
   );
+  const monitor = items.filter((i) => i.group === "monitor");
+  const system = items.filter((i) => i.group === "system");
 
   return (
     <aside
       className={cn(
-        "flex h-full w-[244px] flex-col border-r border-border/50 bg-[hsl(220_14%_97%)] dark:bg-card/30",
+        "flex h-full w-[248px] flex-col border-r border-black/[0.05] bg-[#F2F2F7]/90 backdrop-blur-2xl dark:border-white/[0.06] dark:bg-[#0B0B0F]/80",
         className
       )}
     >
-      <div className="flex items-center gap-3 px-4 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-ember text-ember-foreground shadow-soft">
-          <Flame className="h-4.5 w-4.5 h-4 w-4" aria-hidden="true" />
+      <div className="flex items-center gap-3 px-4 pb-3 pt-5">
+        <div className="flex h-9 w-9 items-center justify-center">
+          <BrandLogo size={36} priority />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold tracking-tight">
+          <p className="truncate text-[15px] font-semibold tracking-tight">
             FireGuard
           </p>
           <p className="truncate text-[11px] text-muted-foreground">
@@ -80,42 +134,46 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
       </div>
 
       <ScrollArea className="flex-1 px-2.5 pb-4">
-        <nav aria-label="Main" className="space-y-0.5">
-          {items.map((item) => {
-            const active =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-            return (
-              <Link
+        <nav aria-label="Main" className="space-y-5">
+          <div className="space-y-0.5">
+            <p className="px-3 pb-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground/80">
+              Monitor
+            </p>
+            {monitor.map((item) => (
+              <NavLink
                 key={item.href}
-                href={item.href}
-                onClick={onNavigate}
-                className={cn(
-                  "relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors",
-                  active
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:bg-black/[0.035] hover:text-foreground dark:hover:bg-white/[0.04]"
-                )}
-                aria-current={active ? "page" : undefined}
-              >
-                {active ? (
-                  <motion.span
-                    layoutId="sidebar-active"
-                    className="absolute inset-0 rounded-xl bg-white shadow-soft dark:bg-secondary"
-                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
-                  />
-                ) : null}
-                <Icon className="relative z-10 h-4 w-4 shrink-0 opacity-80" />
-                <span className="relative z-10">{item.title}</span>
-              </Link>
-            );
-          })}
+                item={item}
+                active={
+                  pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`)
+                }
+                onNavigate={onNavigate}
+              />
+            ))}
+          </div>
+
+          <div className="space-y-0.5">
+            <p className="px-3 pb-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground/80">
+              System
+            </p>
+            {system.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={
+                  pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`)
+                }
+                onNavigate={onNavigate}
+              />
+            ))}
+          </div>
         </nav>
       </ScrollArea>
 
-      <div className="border-t border-border/50 p-3">
-        <div className="rounded-xl px-2.5 py-2">
-          <p className="truncate text-[13px] font-medium">
+      <div className="border-t border-black/[0.05] p-3 dark:border-white/[0.06]">
+        <div className="rounded-[12px] bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]">
+          <p className="truncate text-[13px] font-medium tracking-tight">
             {user?.name ?? "Operator"}
           </p>
           <p className="truncate text-[11px] text-muted-foreground">

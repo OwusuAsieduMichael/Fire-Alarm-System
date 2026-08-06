@@ -35,24 +35,19 @@ export default function DashboardPage() {
         : "safe";
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-9">
       <PageHeader
-        eyebrow="Overview"
         title="Home"
-        description="Critical fire status, live sensors, and recent events — at a glance."
+        description="Is the building safe? What needs attention? Is the device healthy?"
         actions={<ConnectionBadge />}
       />
 
       <StatusHero />
 
-      <section aria-label="Live sensors" className="space-y-3">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="metric-label">Live sensors</p>
-            <h2 className="mt-1 text-lg font-semibold tracking-tight">
-              Telemetry
-            </h2>
-          </div>
+      <section aria-label="Live sensors" className="space-y-4">
+        <div>
+          <p className="metric-label">Telemetry</p>
+          <h2 className="section-title mt-1">Live sensors</h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

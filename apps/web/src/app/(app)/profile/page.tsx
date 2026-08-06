@@ -22,9 +22,8 @@ export default function ProfilePage() {
   }, [user?.name, user?.phone]);
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-8">
       <PageHeader
-        eyebrow="Account"
         title="Profile"
         description="Manage your FireGuard operator identity."
       />

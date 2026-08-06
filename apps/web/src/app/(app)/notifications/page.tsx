@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { AlertList } from "@/features/notifications/alert-list";
 import {
   filterAlerts,
@@ -14,6 +14,13 @@ import {
 } from "@/hooks/use-alerts";
 import { useDevices } from "@/hooks/use-sensors";
 import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
+
+const FILTERS: { value: AlertFilter; label: string }[] = [
+  { value: "ALL", label: "All" },
+  { value: "FIRE", label: "Fire" },
+  { value: "SMOKE", label: "Smoke" },
+  { value: "SMS", label: "SMS" },
+];
 
 export default function NotificationsPage() {
   const [filter, setFilter] = useState<AlertFilter>("ALL");
@@ -34,11 +41,10 @@ export default function NotificationsPage() {
   );
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-8">
       <PageHeader
-        eyebrow="Inbox"
         title="Notifications"
-        description="Fire, smoke, and SMS alert history with one-tap acknowledgement."
+        description="Review fire, smoke, and SMS events. Acknowledge when handled."
         actions={
           <Button
             variant="outline"
@@ -51,14 +57,12 @@ export default function NotificationsPage() {
         }
       />
 
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as AlertFilter)}>
-        <TabsList>
-          <TabsTrigger value="ALL">All</TabsTrigger>
-          <TabsTrigger value="FIRE">Fire</TabsTrigger>
-          <TabsTrigger value="SMOKE">Smoke</TabsTrigger>
-          <TabsTrigger value="SMS">SMS</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <SegmentedControl
+        value={filter}
+        options={FILTERS}
+        onChange={setFilter}
+        ariaLabel="Alert filters"
+      />
 
       <AlertList
         alerts={alerts}
