@@ -54,10 +54,38 @@ export function useAuth() {
     async (email: string, password: string) => {
       try {
         const client = requireSupabase();
-        const { data, error } = await client.auth.signInWithPassword({
-          email: email.trim(),
+        const trimmedEmail = email.trim();
+
+        let { data, error } = await client.auth.signInWithPassword({
+          email: trimmedEmail,
           password,
         });
+
+        // Presentation: auto-confirm then retry so demo accounts reach the dashboard.
+        if (error && isEmailNotConfirmedError(error)) {
+          const confirmRes = await fetch("/api/auth/confirm-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: trimmedEmail }),
+          });
+          const confirmBody = (await confirmRes.json().catch(() => ({}))) as {
+            error?: string;
+          };
+
+          if (!confirmRes.ok) {
+            throw new Error(
+              confirmBody.error ||
+                "Email is not confirmed. Check your inbox or enable service role for presentation unlock."
+            );
+          }
+
+          const retry = await client.auth.signInWithPassword({
+            email: trimmedEmail,
+            password,
+          });
+          data = retry.data;
+          error = retry.error;
+        }
 
         if (error) throw error;
         if (!data.session?.user) {
@@ -76,7 +104,6 @@ export function useAuth() {
         router.replace("/dashboard");
         return { user: profile, accessToken: data.session.access_token };
       } catch (error) {
-        // Inline UI on the login form handles unconfirmed email.
         if (!isEmailNotConfirmedError(error)) {
           toast.error(
             authErrorMessage(
@@ -133,8 +160,42 @@ export function useAuth() {
           throw new Error("Sign-up failed. No user returned.");
         }
 
-        // Email confirmation enabled → no session until confirmed
+        // Email confirmation enabled → confirm for presentation, then sign in
         if (!data.session) {
+          const confirmRes = await fetch("/api/auth/confirm-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+
+          if (confirmRes.ok) {
+            const signedIn = await client.auth.signInWithPassword({
+              email,
+              password: input.password,
+            });
+            if (signedIn.error) throw signedIn.error;
+            if (signedIn.data.session?.user) {
+              await ensureProfilePhone(
+                client,
+                signedIn.data.session.user.id,
+                phone
+              );
+              const profile = await fetchProfile(
+                client,
+                signedIn.data.session.user.id
+              );
+              if (!profile) {
+                throw new Error(
+                  "Account created but profile is missing. Run supabase/schema.sql, then sign in."
+                );
+              }
+              setAuth(profile, signedIn.data.session.access_token);
+              toast.success(`Welcome, ${profile.name.split(" ")[0]}`);
+              router.replace("/dashboard");
+              return { needsConfirmation: false as const, user: profile };
+            }
+          }
+
           const params = new URLSearchParams({
             verify: "pending",
             email,
