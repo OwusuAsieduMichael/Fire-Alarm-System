@@ -34,13 +34,11 @@ async function main() {
 
   const device = await prisma.device.upsert({
     where: { deviceKey: 'FG-ESP32-DEMO-001' },
-    update: {},
+    update: { status: 'OFFLINE' },
     create: {
       name: 'Main Hall Sensor',
       deviceKey: 'FG-ESP32-DEMO-001',
       status: 'OFFLINE',
-      wifiSsid: 'FireGuard-Net',
-      ipAddress: '192.168.1.50',
       firmwareVersion: '1.0.0',
       smokeThreshold: 300,
       smokeCalibration: 0,
@@ -49,9 +47,9 @@ async function main() {
 
   const configs = [
     { key: 'sms_enabled', value: 'false' },
-    { key: 'sms_provider', value: 'mock' },
+    { key: 'sms_provider', value: 'none' },
     { key: 'alert_cooldown_seconds', value: '30' },
-    { key: 'simulator_enabled', value: 'true' },
+    { key: 'simulator_enabled', value: 'false' },
     { key: 'company_name', value: 'FireGuard IoT' },
   ];
 

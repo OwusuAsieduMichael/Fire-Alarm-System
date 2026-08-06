@@ -1,3 +1,8 @@
+/**
+ * DISABLED — not registered in IotModule.
+ * Fake ESP32 telemetry was removed so the stack waits for real hardware.
+ * Keep this file only as reference; do not re-enable for production demos.
+ */
 import {
   Injectable,
   Logger,

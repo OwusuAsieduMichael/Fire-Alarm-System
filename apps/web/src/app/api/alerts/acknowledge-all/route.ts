@@ -1,21 +1,22 @@
-import { isResponse, json, requireUser } from "@/server/http";
-import { getStore } from "@/server/store";
+import { getBearer, error, isResponse, json, requireUser } from "@/server/http";
+import { userDb } from "@/server/supabase-data";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const user = await requireUser(req);
   if (isResponse(user)) return user;
-  const url = new URL(req.url);
-  const deviceId = url.searchParams.get("deviceId");
-  const store = getStore();
-  let count = 0;
-  for (const alert of store.alerts) {
-    if (deviceId && alert.deviceId !== deviceId) continue;
-    if (!alert.acknowledged) {
-      alert.acknowledged = true;
-      count += 1;
-    }
-  }
-  return json({ success: true, count });
+
+  const token = getBearer(req);
+  if (!token) return error("Unauthorized", 401);
+  const db = userDb(token);
+  if (!db) return error("Supabase is not configured", 503);
+
+  const { error: updateError } = await db
+    .from("alerts")
+    .update({ acknowledged: true })
+    .eq("acknowledged", false);
+
+  if (updateError) return error(updateError.message, 400);
+  return json({ success: true });
 }

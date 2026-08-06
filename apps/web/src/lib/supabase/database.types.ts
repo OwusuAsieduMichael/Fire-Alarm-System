@@ -213,6 +213,38 @@ export type Database = {
           },
         ];
       };
+      device_commands: {
+        Row: {
+          id: string;
+          device_id: string;
+          action: string;
+          consumed: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          device_id: string;
+          action: string;
+          consumed?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          device_id?: string;
+          action?: string;
+          consumed?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "device_commands_device_id_fkey";
+            columns: ["device_id"];
+            isOneToOne: false;
+            referencedRelation: "devices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

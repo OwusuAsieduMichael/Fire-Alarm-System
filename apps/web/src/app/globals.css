@@ -152,7 +152,7 @@
   }
 
   .workspace-canvas {
-    background-color: hsl(var(--background));
+    background-color: transparent;
   }
 
   .card-interactive {

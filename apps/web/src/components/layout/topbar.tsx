@@ -46,7 +46,7 @@ export function Topbar({ onMenuClick, onSearchClick }: TopbarProps) {
     "FireGuard";
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-black/[0.05] bg-background/72 px-4 backdrop-blur-2xl dark:border-white/[0.06] sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-black/[0.05] bg-background/55 px-4 backdrop-blur-2xl dark:border-white/[0.06] sm:px-6 lg:px-8">
       <Button
         variant="ghost"
         size="icon"

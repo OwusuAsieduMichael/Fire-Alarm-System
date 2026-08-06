@@ -1,39 +1,39 @@
-import { isResponse, json, requireUser } from "@/server/http";
-import { getStore, tickSimulator } from "@/server/store";
+import { getBearer, error, isResponse, json, requireUser } from "@/server/http";
+import { mapAlert, userDb } from "@/server/supabase-data";
 
 export const runtime = "nodejs";
 
 export async function GET(req: Request) {
   const user = await requireUser(req);
   if (isResponse(user)) return user;
-  tickSimulator();
+
+  const token = getBearer(req);
+  if (!token) return error("Unauthorized", 401);
+  const db = userDb(token);
+  if (!db) return error("Supabase is not configured", 503);
 
   const url = new URL(req.url);
   const deviceId = url.searchParams.get("deviceId");
-  const acknowledged = url.searchParams.get("acknowledged");
   const limit = Math.min(
-    200,
-    Math.max(1, Number(url.searchParams.get("limit") || 50))
+    Number(url.searchParams.get("limit") || 50),
+    200
   );
 
-  const store = getStore();
-  let alerts = [...store.alerts];
-  if (deviceId) alerts = alerts.filter((a) => a.deviceId === deviceId);
-  if (acknowledged !== null && acknowledged !== undefined && acknowledged !== "") {
-    const flag = acknowledged === "true";
-    alerts = alerts.filter((a) => a.acknowledged === flag);
-  }
+  let query = db
+    .from("alerts")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
 
-  const devices = new Map(store.devices.map((d) => [d.id, d]));
+  if (deviceId) query = query.eq("device_id", deviceId);
+
+  const { data, error: alertsError } = await query;
+  if (alertsError) return error(alertsError.message, 500);
+
+  const { data: devices } = await db.from("devices").select("id, name");
+  const nameById = new Map((devices || []).map((d) => [d.id, d.name]));
+
   return json(
-    alerts.slice(0, limit).map((a) => ({
-      ...a,
-      device: devices.get(a.deviceId)
-        ? {
-            id: devices.get(a.deviceId)!.id,
-            name: devices.get(a.deviceId)!.name,
-          }
-        : undefined,
-    }))
+    (data || []).map((row) => mapAlert(row, nameById.get(row.device_id)))
   );
 }

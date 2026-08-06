@@ -3,57 +3,51 @@
 ## 1. Create a project
 
 1. Open [supabase.com](https://supabase.com) → New project  
-2. Note your **Project URL** and **publishable / anon** key (Settings → API)
+2. Copy **Project URL**, **publishable/anon** key, and **secret/service_role** key
 
 ## 2. Apply the schema
 
 1. Dashboard → **SQL** → New query  
-2. Paste [`schema.sql`](./schema.sql)  
-3. Run
+2. Paste [`schema.sql`](./schema.sql) → Run  
+3. If you already ran an older schema, also run:
+   - [`patch-profile-phone.sql`](./patch-profile-phone.sql)
+   - [`patch-device-commands.sql`](./patch-device-commands.sql)
 
-If you already ran an older schema, also run [`patch-profile-phone.sql`](./patch-profile-phone.sql) so signup saves **full name** and **SMS contact**.
+Creates:
 
-This creates:
+- `profiles` (Auth users + SMS contact)
+- `devices`, `sensor_readings`, `alerts`, `connection_logs`, `device_commands`
+- One **OFFLINE** placeholder device (`FG-ESP32-DEMO-001`) — no fake live data
 
-- `profiles` (linked to Supabase Auth users) including `phone` for SMS alerts
-- `devices`, `sensor_readings`, `alerts`, `connection_logs`
-- RLS policies for authenticated operators
-- One demo device (`FG-ESP32-DEMO-001`)
+## 3. Auth
 
-## 3. Auth settings (recommended for first test)
+Enable Email provider. For local testing you can disable **Confirm email**.
 
-Dashboard → **Authentication** → **Providers** → Email enabled.
+Sign up in the web app (full name, email, SMS, password). Login uses email + password.
 
-For local testing, you can turn off **Confirm email** under Authentication → Providers → Email so signup signs in immediately. With confirm email on, users must click the email link before login works.
-
-Add your app URL under Authentication → URL configuration (e.g. `http://localhost:3000`).
-
-## 4. Local / Vercel env
-
-In `apps/web/.env.local` (and Vercel):
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-or-anon-key
-# Optional later for server admin:
-# SUPABASE_SERVICE_ROLE_KEY=your-secret-key
-```
-
-## 5. Sign up in the app
-
-Use **Sign up** in the web app with:
-
-- Full name  
-- Email  
-- SMS contact (notification number)  
-- Password  
-
-Login uses **email + password** only. SMS numbers are stored on `profiles.phone` for alert delivery.
-
-To promote an operator to developer:
+Promote a developer:
 
 ```sql
 update public.profiles
 set role = 'DEVELOPER'
 where email = 'you@example.com';
 ```
+
+## 4. Env (`apps/web/.env.local`)
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-or-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-secret-key
+```
+
+`SUPABASE_SERVICE_ROLE_KEY` is required for ESP32 ingest (`POST /api/iot/telemetry`).
+
+## 5. ESP32 contract
+
+- **Telemetry:** `POST /api/iot/telemetry`  
+  Header `x-device-key: FG-ESP32-DEMO-001`  
+  Body: `{ "smokeLevel": 120, "flameDetected": false, ... }`
+- **Commands:** `GET /api/iot/telemetry` with same header — returns queued controls
+
+See `firmware/fireguard_esp32/fireguard_esp32.ino`.

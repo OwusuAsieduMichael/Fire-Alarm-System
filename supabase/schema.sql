@@ -226,16 +226,13 @@ create policy "logs_select_authenticated"
   to authenticated
   using (true);
 
--- Seed demo device (safe to re-run)
+-- Seed one offline placeholder device (safe to re-run). No fake live telemetry.
 insert into public.devices (
   id,
   name,
   device_key,
   status,
-  wifi_ssid,
-  ip_address,
   firmware_version,
-  last_seen,
   smoke_threshold,
   smoke_calibration
 )
@@ -243,36 +240,31 @@ values (
   '11111111-1111-1111-1111-111111111111',
   'Main Hall Sensor',
   'FG-ESP32-DEMO-001',
-  'ONLINE',
-  'FireGuard-Net',
-  '192.168.1.50',
+  'OFFLINE',
   '1.0.0',
-  now(),
   300,
   0
 )
-on conflict (device_key) do nothing;
+on conflict (device_key) do update
+  set status = excluded.status
+  where public.devices.last_seen is null;
 
-insert into public.alerts (
-  device_id,
-  type,
-  severity,
-  title,
-  message,
-  sms_status,
-  acknowledged
-)
-select
-  d.id,
-  'SYSTEM',
-  'INFO',
-  'System Online',
-  'FireGuard Supabase backend is ready.',
-  'NONE',
-  true
-from public.devices d
-where d.device_key = 'FG-ESP32-DEMO-001'
-  and not exists (
-    select 1 from public.alerts a
-    where a.device_id = d.id and a.title = 'System Online'
-  );
+-- Pending control commands for ESP32 to poll
+create table if not exists public.device_commands (
+  id uuid primary key default gen_random_uuid(),
+  device_id uuid not null references public.devices (id) on delete cascade,
+  action text not null,
+  consumed boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists device_commands_pending_idx
+  on public.device_commands (device_id, consumed, created_at);
+
+alter table public.device_commands enable row level security;
+
+drop policy if exists "commands_select_authenticated" on public.device_commands;
+create policy "commands_select_authenticated"
+  on public.device_commands for select
+  to authenticated
+  using (true);

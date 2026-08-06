@@ -26,6 +26,7 @@ interface DeviceStore {
   setSelectedDeviceId: (id: string | null) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
   applyLiveReading: (partial: Partial<LiveDeviceState>) => void;
+  applyLiveReadingWithHistory: (partial: Partial<LiveDeviceState>) => void;
   setSmokeHistory: (points: SmokeHistoryPoint[]) => void;
   pushSmokePoint: (point: SmokeHistoryPoint) => void;
   setRecentAlerts: (alerts: Alert[]) => void;
@@ -45,7 +46,7 @@ const defaultLive: LiveDeviceState = {
   buzzerActive: false,
   ledStatus: "off",
   alarmActive: false,
-  lcdMessage: "FireGuard Ready",
+  lcdMessage: "Waiting for ESP32…",
   status: "OFFLINE",
   lastSeen: null,
   realDeviceConnected: false,
@@ -73,8 +74,17 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   setConnectionStatus: (connectionStatus) => set({ connectionStatus }),
 
   applyLiveReading: (partial) =>
+    set((state) => ({
+      live: { ...state.live, ...partial },
+    })),
+
+  /** Apply live fields and optionally append a chart point (real telemetry only). */
+  applyLiveReadingWithHistory: (partial: Partial<LiveDeviceState>) =>
     set((state) => {
       const next = { ...state.live, ...partial };
+      if (!next.realDeviceConnected) {
+        return { live: next };
+      }
       const point: SmokeHistoryPoint = {
         timestamp: new Date().toISOString(),
         smokeLevel: next.smokeLevel,

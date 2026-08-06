@@ -1,5 +1,5 @@
-import { isResponse, json, requireUser } from "@/server/http";
-import { getStore, tickSimulator } from "@/server/store";
+import { getBearer, error, isResponse, json, requireUser } from "@/server/http";
+import { mapReading, userDb } from "@/server/supabase-data";
 
 export const runtime = "nodejs";
 
@@ -7,25 +7,28 @@ export async function GET(req: Request) {
   const user = await requireUser(req);
   if (isResponse(user)) return user;
 
-  const live = tickSimulator();
-  const store = getStore();
-  const url = new URL(req.url);
-  const deviceId = url.searchParams.get("deviceId") || live.deviceId;
-  const latest = store.readings.find((r) => r.deviceId === deviceId);
+  const token = getBearer(req);
+  if (!token) return error("Unauthorized", 401);
+  const db = userDb(token);
+  if (!db) return error("Supabase is not configured", 503);
 
-  if (latest) return json(latest);
+  const { data: devices } = await db
+    .from("devices")
+    .select("id")
+    .order("created_at", { ascending: true })
+    .limit(1);
 
-  return json({
-    id: "live",
-    deviceId: live.deviceId,
-    smokeLevel: live.smokeLevel,
-    flameDetected: live.flameDetected,
-    temperature: live.temperature,
-    humidity: live.humidity,
-    buzzerActive: live.buzzerActive,
-    ledStatus: live.ledStatus,
-    alarmActive: live.alarmActive,
-    lcdMessage: live.lcdMessage,
-    createdAt: live.lastSeen,
-  });
+  const deviceId = devices?.[0]?.id;
+  if (!deviceId) return json(null);
+
+  const { data, error: readingError } = await db
+    .from("sensor_readings")
+    .select("*")
+    .eq("device_id", deviceId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (readingError) return error(readingError.message, 500);
+  return json(data ? mapReading(data) : null);
 }

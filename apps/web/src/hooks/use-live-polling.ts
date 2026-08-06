@@ -51,9 +51,7 @@ export function useLivePolling(enabled = true) {
           realDeviceConnected: data.live.realDeviceConnected,
         });
         setRecentAlerts(data.recentAlerts);
-        if (data.smokeHistory?.length) {
-          setSmokeHistory(data.smokeHistory);
-        }
+        setSmokeHistory(data.smokeHistory ?? []);
         setConnectionStatus("connected");
       } catch {
         if (!cancelled) {
