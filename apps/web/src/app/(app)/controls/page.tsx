@@ -1,23 +1,25 @@
 "use client";
 
 import {
+  Activity,
   BellRing,
   CircleStop,
+  Flame,
   Siren,
   Volume2,
-  VolumeX,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatusPill } from "@/components/shared/status-pill";
+import { Card, CardContent } from "@/components/ui/card";
 import { ControlActionCard } from "@/features/controls/control-action-card";
 import {
-  useBuzzerControl,
   useEmergency,
   useResetAlarm,
   useTestAlarm,
 } from "@/hooks/use-controls";
 import { useDevices } from "@/hooks/use-sensors";
 import { useDeviceStore } from "@/stores/device-store";
+import { cn } from "@/lib/utils";
 
 export default function ControlsPage() {
   useDevices();
@@ -26,42 +28,64 @@ export default function ControlsPage() {
   const testAlarm = useTestAlarm();
   const resetAlarm = useResetAlarm();
   const emergency = useEmergency();
-  const buzzer = useBuzzerControl();
+
+  const alertOn = live.alarmActive || teamLedStatus === "red";
+  const flameOn = live.flameDetected || teamLedStatus === "red";
+  const smokeElevated =
+    teamLedStatus === "red" || live.smokeLevel > (live.realDeviceConnected ? 300 : 60);
+  const buzzerOn = live.buzzerActive || teamLedStatus === "red";
 
   return (
     <div className="space-y-5 sm:space-y-7">
       <PageHeader
         eyebrow="Actions"
         title="Controls"
-        description="Send confirmed commands to the ESP32. Every action asks for confirmation."
+        description="Monitor flame, smoke, and buzzer status. Reset returns everything to normal until a new team message arrives."
         actions={
-          <div className="flex flex-wrap gap-2">
-            <StatusPill
-              label={
-                live.alarmActive || teamLedStatus === "red"
-                  ? "Alarm active"
-                  : "System calm"
-              }
-              tone={
-                live.alarmActive || teamLedStatus === "red" ? "alarm" : "safe"
-              }
-              pulse={false}
-            />
-            <StatusPill
-              label={
-                live.buzzerActive || teamLedStatus === "red"
-                  ? "Buzzer on"
-                  : "Buzzer off"
-              }
-              tone={
-                live.buzzerActive || teamLedStatus === "red"
-                  ? "warning"
-                  : "neutral"
-              }
-            />
-          </div>
+          <StatusPill
+            label={alertOn ? "Alarm active" : "System calm"}
+            tone={alertOn ? "alarm" : "safe"}
+            pulse={false}
+          />
         }
       />
+
+      <section aria-label="Actuator status" className="space-y-3">
+        <div>
+          <p className="metric-label">Status</p>
+          <h2 className="section-title mt-1">Flame · Smoke · Buzzer</h2>
+        </div>
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+          <StatusIconCard
+            title="Flame"
+            icon={Flame}
+            active={flameOn}
+            activeLabel="Detected"
+            idleLabel="Clear"
+            activeClass="border-ember/35 bg-ember/10 text-ember"
+          />
+          <StatusIconCard
+            title="Smoke"
+            icon={Activity}
+            active={smokeElevated}
+            activeLabel={`${Math.round(live.smokeLevel)} ppm`}
+            idleLabel={`${Math.round(live.smokeLevel)} ppm`}
+            activeClass="border-warning/40 bg-warning/10 text-warning"
+          />
+          <StatusIconCard
+            title="Buzzer"
+            icon={Volume2}
+            active={buzzerOn}
+            activeLabel="Active"
+            idleLabel="Idle"
+            activeClass="border-ember/35 bg-ember/10 text-ember"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground sm:text-sm">
+          Reset System clears flame, smoke, and buzzer together with the LED and
+          LCD.
+        </p>
+      </section>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
         <ControlActionCard
@@ -80,11 +104,11 @@ export default function ControlsPage() {
         />
         <ControlActionCard
           title="Reset System"
-          description="Return LED, LCD, buzzer, and live sensors to the normal safe state until a new team message arrives."
+          description="Clear flame, smoke, and buzzer indicators and restore the safe LCD / LED state until a new team message arrives."
           icon={CircleStop}
           tone="calm"
           confirmTitle="Reset everything to normal?"
-          confirmDescription="Clears the shared red alert, silences the buzzer, and restores Fire Alarm Sys with S:60 F:1000. Alerts return only when someone sends a new team message."
+          confirmDescription="Clears flame, smoke, and buzzer status, silences the alert, and restores Fire Alarm Sys with S:60 F:1000. Alerts return only when someone sends a new team message."
           confirmLabel="Reset now"
           loading={resetAlarm.isPending}
           onConfirm={async () => {
@@ -106,31 +130,56 @@ export default function ControlsPage() {
           }}
           index={2}
         />
-        <ControlActionCard
-          title="Buzzer On"
-          description="Enable the buzzer without changing the alarm state."
-          icon={Volume2}
-          tone="neutral"
-          confirmLabel="Turn on"
-          loading={buzzer.isPending && buzzer.variables?.on === true}
-          onConfirm={async () => {
-            await buzzer.mutateAsync({ on: true });
-          }}
-          index={3}
-        />
-        <ControlActionCard
-          title="Buzzer Off"
-          description="Silence the buzzer while preserving sensor monitoring."
-          icon={VolumeX}
-          tone="neutral"
-          confirmLabel="Turn off"
-          loading={buzzer.isPending && buzzer.variables?.on === false}
-          onConfirm={async () => {
-            await buzzer.mutateAsync({ on: false });
-          }}
-          index={4}
-        />
       </div>
     </div>
+  );
+}
+
+function StatusIconCard({
+  title,
+  icon: Icon,
+  active,
+  activeLabel,
+  idleLabel,
+  activeClass,
+}: {
+  title: string;
+  icon: typeof Flame;
+  active: boolean;
+  activeLabel: string;
+  idleLabel: string;
+  activeClass: string;
+}) {
+  return (
+    <Card
+      className={cn(
+        "border-border/70 transition-colors",
+        active && activeClass
+      )}
+    >
+      <CardContent className="flex flex-col items-center gap-2.5 px-3 py-4 text-center sm:gap-3 sm:py-5">
+        <div
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-2xl border sm:h-14 sm:w-14",
+            active
+              ? "border-current/30 bg-current/10"
+              : "border-border/70 bg-muted/60 text-muted-foreground"
+          )}
+        >
+          <Icon className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true" />
+        </div>
+        <div>
+          <p className="text-sm font-semibold tracking-tight">{title}</p>
+          <p
+            className={cn(
+              "mt-0.5 text-xs",
+              active ? "font-medium" : "text-muted-foreground"
+            )}
+          >
+            {active ? activeLabel : idleLabel}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
