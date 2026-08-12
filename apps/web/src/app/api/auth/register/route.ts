@@ -5,12 +5,17 @@ import {
   getSupabaseUrl,
 } from "@/lib/supabase/env";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
+import {
+  isTeamAllowedEmail,
+  TEAM_SIGNUP_DENIED_MESSAGE,
+} from "@/lib/team-allowlist";
 
 export const runtime = "nodejs";
 
 /**
  * Presentation-friendly signup: create a confirmed user with the service role
  * so Supabase never sends a confirmation email / hits resend limits.
+ * Only allowlisted team emails may register.
  */
 export async function POST(request: Request) {
   const admin = createSupabaseAdminClient();
@@ -43,6 +48,12 @@ export async function POST(request: Request) {
 
   if (!email || !email.includes("@")) {
     return NextResponse.json({ error: "Valid email required" }, { status: 400 });
+  }
+  if (!isTeamAllowedEmail(email)) {
+    return NextResponse.json(
+      { error: TEAM_SIGNUP_DENIED_MESSAGE },
+      { status: 403 }
+    );
   }
   if (!password || password.length < 6) {
     return NextResponse.json(

@@ -5,11 +5,18 @@ import Link from "next/link";
 import { Eye, EyeOff, Loader2, Phone, UserRound } from "lucide-react";
 import { z } from "zod";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  isTeamAllowedEmail,
+  TEAM_SIGNUP_DENIED_MESSAGE,
+} from "@/lib/team-allowlist";
 import { cn } from "@/lib/utils";
 
 const signupSchema = z.object({
   fullName: z.string().trim().min(2, "Enter your full name"),
-  email: z.string().email("Enter a valid email"),
+  email: z
+    .string()
+    .email("Enter a valid email")
+    .refine(isTeamAllowedEmail, TEAM_SIGNUP_DENIED_MESSAGE),
   phone: z
     .string()
     .trim()
@@ -69,7 +76,7 @@ export default function SignUpPage() {
       <div className="space-y-2 text-center sm:text-left">
         <h1 className="text-3xl font-semibold tracking-tight">Sign up</h1>
         <p className="text-sm text-white/70">
-          Create an account to monitor your fire alarm system. SMS contact is
+          Team signup only — use your assigned FireGuard email. SMS contact is
           used for alert notifications.
         </p>
       </div>
