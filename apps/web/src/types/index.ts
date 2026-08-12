@@ -49,7 +49,7 @@ export interface SensorReading {
   device?: Device;
 }
 
-export type AlertType = "FIRE" | "SMOKE" | "SYSTEM" | "SMS";
+export type AlertType = "FIRE" | "SMOKE" | "SYSTEM" | "SMS" | "TEAM";
 export type AlertSeverity = "INFO" | "WARNING" | "CRITICAL";
 export type SmsStatus = "PENDING" | "SENT" | "FAILED" | "NONE";
 
@@ -64,6 +64,17 @@ export interface Alert {
   acknowledged: boolean;
   createdAt: string;
   device?: Pick<Device, "id" | "name">;
+  senderName?: string;
+  senderEmail?: string;
+}
+
+export interface TeamMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderEmail: string;
+  body: string;
+  createdAt: string;
 }
 
 export interface ConnectionLog {

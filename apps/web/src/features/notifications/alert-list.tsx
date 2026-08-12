@@ -112,11 +112,18 @@ export function AlertList({
                 </p>
               </div>
               <div className="shrink-0">
-                {alert.acknowledged ? (
-                  <Badge variant="success" className="gap-1">
-                    <Check className="h-3 w-3" />
-                    Acknowledged
-                  </Badge>
+                {alert.type === "TEAM" || alert.acknowledged ? (
+                  alert.type === "TEAM" ? (
+                    <Badge variant="info" className="gap-1">
+                      <MessageSquare className="h-3 w-3" />
+                      Team
+                    </Badge>
+                  ) : (
+                    <Badge variant="success" className="gap-1">
+                      <Check className="h-3 w-3" />
+                      Acknowledged
+                    </Badge>
+                  )
                 ) : (
                   <Button
                     size="sm"

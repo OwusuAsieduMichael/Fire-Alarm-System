@@ -269,6 +269,35 @@ export type Database = {
           },
         ];
       };
+      team_messages: {
+        Row: {
+          id: string;
+          sender_id: string;
+          body: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          sender_id: string;
+          body: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          sender_id?: string;
+          body?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "team_messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

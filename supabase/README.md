@@ -12,11 +12,13 @@
 3. If you already ran an older schema, also run:
    - [`patch-profile-phone.sql`](./patch-profile-phone.sql)
    - [`patch-device-commands.sql`](./patch-device-commands.sql)
+   - [`team-messages.sql`](./team-messages.sql) ← shared Notifications inbox for team operators
 
 Creates:
 
 - `profiles` (Auth users + SMS contact)
 - `devices`, `sensor_readings`, `alerts`, `connection_logs`, `device_commands`
+- `team_messages` (broadcast messages between assigned operators)
 - Optional seed device `FG-ESP32-DEMO-001` (developer-only). Normal users get their own key auto-created on first app open.
 
 ## 3. Auth

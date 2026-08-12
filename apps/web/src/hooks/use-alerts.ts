@@ -6,7 +6,7 @@ import { apiClient } from "@/lib/api";
 import { useDeviceStore } from "@/stores/device-store";
 import type { Alert } from "@/types";
 
-export type AlertFilter = "ALL" | "FIRE" | "SMOKE" | "SMS";
+export type AlertFilter = "ALL" | "FIRE" | "SMOKE" | "SMS" | "TEAM";
 
 interface AlertsQuery {
   deviceId?: string | null;
@@ -81,6 +81,9 @@ export function filterAlerts(alerts: Alert[], filter: AlertFilter): Alert[] {
     return alerts.filter(
       (a) => a.type === "SMS" || a.smsStatus !== "NONE"
     );
+  }
+  if (filter === "TEAM") {
+    return alerts.filter((a) => a.type === "TEAM");
   }
   return alerts.filter((a) => a.type === filter);
 }
