@@ -79,5 +79,24 @@ export async function POST(req: Request) {
     );
   }
 
-  return json({ ledStatus, ledUpdatedAt });
+  let messagesCleared = 0;
+  if (ledStatus === "green") {
+    const { data: deleted, error: clearError } = await client
+      .from("team_messages")
+      .delete()
+      .neq("id", "00000000-0000-0000-0000-000000000000")
+      .select("id");
+
+    if (clearError) {
+      return error(
+        clearError.message.includes("team_messages")
+          ? "Could not clear team messages. Run supabase/patch-clear-team-messages.sql in Supabase."
+          : clearError.message,
+        500
+      );
+    }
+    messagesCleared = deleted?.length ?? 0;
+  }
+
+  return json({ ledStatus, ledUpdatedAt, messagesCleared });
 }

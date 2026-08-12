@@ -53,16 +53,14 @@ export function useResetAlarm() {
   const applyLiveReading = useDeviceStore((s) => s.applyLiveReading);
   const setTeamLedStatus = useDeviceStore((s) => s.setTeamLedStatus);
   const setSmokeHistory = useDeviceStore((s) => s.setSmokeHistory);
+  const setRecentAlerts = useDeviceStore((s) => s.setRecentAlerts);
   const pushSocketLog = useDeviceStore((s) => s.pushSocketLog);
 
   return useMutation<ControlResult, Error, void>({
     mutationFn: async () => {
-      // Always clear shared team alert (LED / LCD / buzzer / sensors).
-      const team = await apiClient.post<{
-        ledStatus: "green" | "red" | "amber";
-        ledUpdatedAt: string;
-      }>("/team-status", { ledStatus: "green" });
-      setTeamLedStatus(team.ledStatus || "green", team.ledUpdatedAt);
+      // Stop buzzer / LED immediately in the UI, then persist reset + clear inbox.
+      const nowIso = new Date().toISOString();
+      setTeamLedStatus("green", nowIso);
       applyLiveReading({
         alarmActive: false,
         buzzerActive: false,
@@ -72,6 +70,30 @@ export function useResetAlarm() {
         flameLevel: 1000,
         lcdMessage: "Fire Alarm Sys",
       });
+      setRecentAlerts(
+        useDeviceStore
+          .getState()
+          .recentAlerts.filter((a) => !a.id.startsWith("team:"))
+      );
+      queryClient.setQueriesData({ queryKey: ["team-messages"] }, (old) => {
+        if (!old || typeof old !== "object") {
+          return { messages: [], ledStatus: "green", ledUpdatedAt: nowIso };
+        }
+        return {
+          ...(old as object),
+          messages: [],
+          ledStatus: "green",
+          ledUpdatedAt: nowIso,
+        };
+      });
+
+      const team = await apiClient.post<{
+        ledStatus: "green" | "red" | "amber";
+        ledUpdatedAt: string;
+        messagesCleared?: number;
+      }>("/team-status", { ledStatus: "green" });
+      setTeamLedStatus(team.ledStatus || "green", team.ledUpdatedAt);
+
       const now = Date.now();
       setSmokeHistory(
         Array.from({ length: 12 }, (_, i) => ({
@@ -87,12 +109,15 @@ export function useResetAlarm() {
           deviceId: id,
         });
       } else {
-        pushSocketLog("Control: system reset (team alert cleared)");
+        pushSocketLog("Control: system reset (alerts cleared, buzzer stopped)");
       }
-      return { success: true, message: "System reset to normal" };
+      return {
+        success: true,
+        message: `System reset · cleared ${team.messagesCleared ?? 0} messages`,
+      };
     },
-    onSuccess: () => {
-      toast.success("System reset to normal");
+    onSuccess: (data) => {
+      toast.success(data.message || "System reset to normal");
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
       queryClient.invalidateQueries({ queryKey: ["team-messages"] });
     },

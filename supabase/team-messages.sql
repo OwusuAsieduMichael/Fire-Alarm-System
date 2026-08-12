@@ -29,7 +29,13 @@ create policy "team_messages_insert_own"
   to authenticated
   with check (sender_id = auth.uid());
 
-grant select, insert on public.team_messages to authenticated;
+grant select, insert, delete on public.team_messages to authenticated;
+
+drop policy if exists "team_messages_delete_authenticated" on public.team_messages;
+create policy "team_messages_delete_authenticated"
+  on public.team_messages for delete
+  to authenticated
+  using (true);
 
 -- Shared LED state for the team dashboard (default green; red after a message).
 create table if not exists public.team_status (

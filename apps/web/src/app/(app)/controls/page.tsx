@@ -104,11 +104,11 @@ export default function ControlsPage() {
         />
         <ControlActionCard
           title="Reset System"
-          description="Clear flame, smoke, and buzzer indicators and restore the safe LCD / LED state until a new team message arrives."
+          description="Clear all team messages, stop the buzzer, and restore flame, smoke, LED, and LCD to the safe state until a new message arrives."
           icon={CircleStop}
           tone="calm"
           confirmTitle="Reset everything to normal?"
-          confirmDescription="Clears flame, smoke, and buzzer status, silences the alert, and restores Fire Alarm Sys with S:60 F:1000. Alerts return only when someone sends a new team message."
+          confirmDescription="Deletes every team inbox message, silences the buzzer, and restores Fire Alarm Sys with S:60 F:1000. Alerts return only when someone sends a new team message."
           confirmLabel="Reset now"
           loading={resetAlarm.isPending}
           onConfirm={async () => {
