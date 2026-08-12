@@ -298,6 +298,24 @@ export type Database = {
           },
         ];
       };
+      team_status: {
+        Row: {
+          id: number;
+          led_status: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: number;
+          led_status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          led_status?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

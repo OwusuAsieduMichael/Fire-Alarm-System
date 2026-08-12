@@ -24,15 +24,12 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
 
 const FILTERS: { value: AlertFilter; label: string }[] = [
-  { value: "ALL", label: "All" },
-  { value: "TEAM", label: "Team" },
   { value: "FIRE", label: "Fire" },
   { value: "SMOKE", label: "Smoke" },
-  { value: "SMS", label: "SMS" },
 ];
 
 export default function NotificationsPage() {
-  const [filter, setFilter] = useState<AlertFilter>("ALL");
+  const [filter, setFilter] = useState<AlertFilter>("FIRE");
   const [draft, setDraft] = useState("");
   const user = useAuthStore((s) => s.user);
   const canMessage = isTeamAllowedEmail(user?.email);
@@ -51,7 +48,9 @@ export default function NotificationsPage() {
 
   const merged = useMemo(() => {
     const deviceAlerts = data ?? storeAlerts;
-    const teamAlerts = (teamMessages.data ?? []).map(teamMessageToAlert);
+    const teamAlerts = (teamMessages.data?.messages ?? []).map(
+      teamMessageToAlert
+    );
     return [...teamAlerts, ...deviceAlerts].sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -76,7 +75,7 @@ export default function NotificationsPage() {
       <PageHeader
         eyebrow="Inbox"
         title="Notifications"
-        description="Team messages, fire, smoke, and SMS events in one place."
+        description="Fire and smoke events, plus team messages visible to every operator."
         actions={
           <Button
             variant="outline"
@@ -111,7 +110,7 @@ export default function NotificationsPage() {
           />
           <div className="mt-3 flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              Visible to all assigned operators in Notifications.
+              Shows under Fire and Smoke for everyone. Turns the LED red.
             </p>
             <Button
               type="submit"

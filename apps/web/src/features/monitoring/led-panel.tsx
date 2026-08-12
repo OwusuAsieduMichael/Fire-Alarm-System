@@ -49,7 +49,17 @@ const ledMeta: Record<
 
 export function LedPanel() {
   const ledStatus = useDeviceStore((s) => s.live.ledStatus);
-  const active = normalizeLed(ledStatus);
+  const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
+  const deviceLed = normalizeLed(ledStatus);
+  // Team message alert wins; otherwise default safe = green.
+  const active: LedColor =
+    teamLedStatus === "red"
+      ? "red"
+      : teamLedStatus === "amber"
+        ? "amber"
+        : deviceLed === "red" || deviceLed === "amber"
+          ? deviceLed
+          : "green";
 
   return (
     <Card>

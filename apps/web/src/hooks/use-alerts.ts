@@ -6,7 +6,7 @@ import { apiClient } from "@/lib/api";
 import { useDeviceStore } from "@/stores/device-store";
 import type { Alert } from "@/types";
 
-export type AlertFilter = "ALL" | "FIRE" | "SMOKE" | "SMS" | "TEAM";
+export type AlertFilter = "FIRE" | "SMOKE";
 
 interface AlertsQuery {
   deviceId?: string | null;
@@ -75,15 +75,9 @@ export function useAcknowledgeAllAlerts() {
   });
 }
 
+/** Fire/Smoke tabs also include team broadcast messages. */
 export function filterAlerts(alerts: Alert[], filter: AlertFilter): Alert[] {
-  if (filter === "ALL") return alerts;
-  if (filter === "SMS") {
-    return alerts.filter(
-      (a) => a.type === "SMS" || a.smsStatus !== "NONE"
-    );
-  }
-  if (filter === "TEAM") {
-    return alerts.filter((a) => a.type === "TEAM");
-  }
-  return alerts.filter((a) => a.type === filter);
+  return alerts.filter(
+    (a) => a.type === filter || a.type === "TEAM" || a.type === "SYSTEM"
+  );
 }

@@ -1,27 +1,57 @@
 "use client";
 
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api";
+import { useDeviceStore } from "@/stores/device-store";
 import type { Alert, TeamMessage } from "@/types";
 
+type TeamLedStatus = "green" | "red" | "amber";
+
+interface TeamMessagesResponse {
+  messages: TeamMessage[];
+  ledStatus: TeamLedStatus;
+}
+
+interface TeamSendResponse {
+  message: TeamMessage;
+  ledStatus: TeamLedStatus;
+}
+
 export function useTeamMessages(limit = 50) {
-  return useQuery({
-    queryKey: ["team-messages", limit],
+  const setTeamLedStatus = useDeviceStore((s) => s.setTeamLedStatus);
+  const enabled = limit > 0;
+
+  const query = useQuery({
+    queryKey: ["team-messages", Math.max(limit, 1)],
     queryFn: () =>
-      apiClient.get<TeamMessage[]>(`/team-messages?limit=${limit}`),
-    refetchInterval: 8_000,
+      apiClient.get<TeamMessagesResponse>(
+        `/team-messages?limit=${Math.max(limit, 1)}`
+      ),
+    refetchInterval: enabled ? 8_000 : false,
+    enabled,
   });
+
+  useEffect(() => {
+    if (query.data?.ledStatus) {
+      setTeamLedStatus(query.data.ledStatus);
+    }
+  }, [query.data?.ledStatus, setTeamLedStatus]);
+
+  return query;
 }
 
 export function useSendTeamMessage() {
   const queryClient = useQueryClient();
+  const setTeamLedStatus = useDeviceStore((s) => s.setTeamLedStatus);
 
   return useMutation({
     mutationFn: async (message: string) => {
-      return apiClient.post<TeamMessage>("/team-messages", { message });
+      return apiClient.post<TeamSendResponse>("/team-messages", { message });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setTeamLedStatus(data.ledStatus || "red");
       toast.success("Message sent to the team");
       queryClient.invalidateQueries({ queryKey: ["team-messages"] });
     },

@@ -17,6 +17,7 @@ interface DeviceStore {
   devices: Device[];
   selectedDeviceId: string | null;
   live: LiveDeviceState;
+  teamLedStatus: "green" | "red" | "amber";
   smokeHistory: SmokeHistoryPoint[];
   recentAlerts: Alert[];
   connectionLogs: ConnectionLog[];
@@ -25,6 +26,7 @@ interface DeviceStore {
   setDevices: (devices: Device[]) => void;
   setSelectedDeviceId: (id: string | null) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
+  setTeamLedStatus: (status: "green" | "red" | "amber") => void;
   applyLiveReading: (partial: Partial<LiveDeviceState>) => void;
   applyLiveReadingWithHistory: (partial: Partial<LiveDeviceState>) => void;
   setSmokeHistory: (points: SmokeHistoryPoint[]) => void;
@@ -44,7 +46,7 @@ const defaultLive: LiveDeviceState = {
   temperature: null,
   humidity: null,
   buzzerActive: false,
-  ledStatus: "off",
+  ledStatus: "green",
   alarmActive: false,
   lcdMessage: "Waiting for ESP32…",
   status: "OFFLINE",
@@ -56,6 +58,7 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   devices: [],
   selectedDeviceId: null,
   live: defaultLive,
+  teamLedStatus: "green",
   smokeHistory: [],
   recentAlerts: [],
   connectionLogs: [],
@@ -72,6 +75,8 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   setSelectedDeviceId: (id) => set({ selectedDeviceId: id }),
 
   setConnectionStatus: (connectionStatus) => set({ connectionStatus }),
+
+  setTeamLedStatus: (teamLedStatus) => set({ teamLedStatus }),
 
   applyLiveReading: (partial) =>
     set((state) => ({
@@ -134,6 +139,7 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   resetLive: () =>
     set({
       live: defaultLive,
+      teamLedStatus: "green",
       smokeHistory: [],
     }),
 }));

@@ -7,6 +7,7 @@ import type { TeamMessage } from "@/types";
 export const runtime = "nodejs";
 
 type ProfileLite = { id: string; name: string; email: string };
+type LedStatus = "green" | "red" | "amber";
 
 function mapMessage(
   row: { id: string; sender_id: string; body: string; created_at: string },
@@ -20,6 +21,32 @@ function mapMessage(
     body: row.body,
     createdAt: row.created_at,
   };
+}
+
+async function readLedStatus(
+  db: NonNullable<ReturnType<typeof userDb>>
+): Promise<LedStatus> {
+  const { data } = await db
+    .from("team_status")
+    .select("led_status")
+    .eq("id", 1)
+    .maybeSingle();
+  const led = data?.led_status;
+  if (led === "red" || led === "amber" || led === "green") return led;
+  return "green";
+}
+
+async function setLedStatus(
+  db: NonNullable<ReturnType<typeof userDb>>,
+  led: LedStatus
+) {
+  const admin = createSupabaseAdminClient();
+  const client = admin ?? db;
+  await client.from("team_status").upsert({
+    id: 1,
+    led_status: led,
+    updated_at: new Date().toISOString(),
+  });
 }
 
 export async function GET(req: Request) {
@@ -71,9 +98,14 @@ export async function GET(req: Request) {
     }
   }
 
-  return json(
-    (data || []).map((row) => mapMessage(row, profilesById.get(row.sender_id)))
-  );
+  const ledStatus = await readLedStatus(db);
+
+  return json({
+    messages: (data || []).map((row) =>
+      mapMessage(row, profilesById.get(row.sender_id))
+    ),
+    ledStatus,
+  });
 }
 
 export async function POST(req: Request) {
@@ -115,12 +147,17 @@ export async function POST(req: Request) {
     );
   }
 
+  await setLedStatus(db, "red");
+
   return json(
-    mapMessage(data, {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    }),
+    {
+      message: mapMessage(data, {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      }),
+      ledStatus: "red" as const,
+    },
     201
   );
 }
