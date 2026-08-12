@@ -56,14 +56,14 @@ export function Topbar({
     teamLedStatus === "red" || Boolean(latestMessage);
 
   const title =
-    pathname === "/notifications/latest"
+    pathname === "/alert" || pathname === "/notifications/latest"
       ? "Latest message"
       : titles[pathname] ||
         SIDEBAR_NAV.find((item) => pathname.startsWith(item.href))?.title ||
         "FireGuard";
 
   const openLatestNotification = () => {
-    router.push("/notifications/latest");
+    router.push("/alert");
   };
 
   return (

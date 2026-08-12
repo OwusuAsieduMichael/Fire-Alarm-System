@@ -1,7 +1,6 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { LatestMessageView } from "@/features/notifications/latest-message-view";
-
-export default function LatestNotificationPage() {
-  return <LatestMessageView />;
+/** Bell formerly used /notifications/latest — keep the URL working. */
+export default function LatestNotificationRedirect() {
+  redirect("/alert");
 }
