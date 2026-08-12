@@ -13,6 +13,7 @@ interface AlertListProps {
   alerts: Alert[];
   loading?: boolean;
   acknowledgingId?: string | null;
+  focusId?: string | null;
   onAcknowledge: (id: string) => void;
 }
 
@@ -33,6 +34,7 @@ export function AlertList({
   alerts,
   loading,
   acknowledgingId,
+  focusId,
   onAcknowledge,
 }: AlertListProps) {
   if (loading) {
@@ -60,10 +62,13 @@ export function AlertList({
       {alerts.map((alert) => (
         <li
           key={alert.id}
+          id={`alert-${alert.id}`}
           className={cn(
-            "rounded-[1.15rem] border border-border/70 border-l-[3px] bg-card p-3.5 shadow-soft sm:rounded-[1.25rem] sm:p-5",
+            "scroll-mt-24 rounded-[1.15rem] border border-border/70 border-l-[3px] bg-card p-3.5 shadow-soft sm:rounded-[1.25rem] sm:p-5",
             severityStyles[alert.severity],
-            alert.acknowledged && "opacity-65"
+            alert.acknowledged && "opacity-65",
+            focusId === alert.id &&
+              "ring-2 ring-ember/50 border-ember/40 shadow-elevated"
           )}
         >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

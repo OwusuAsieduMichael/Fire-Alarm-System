@@ -2,6 +2,7 @@
 
 import { useTheme } from "next-themes";
 import {
+  Bell,
   LogOut,
   Moon,
   Search,
@@ -21,7 +22,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
-import { initials } from "@/lib/utils";
+import { useTeamMessages } from "@/hooks/use-team-messages";
+import { isTeamAllowedEmail } from "@/lib/team-allowlist";
+import { cn, initials } from "@/lib/utils";
+import { useDeviceStore } from "@/stores/device-store";
 import { HamburgerButton } from "./hamburger-button";
 import { SIDEBAR_NAV } from "./sidebar";
 
@@ -44,11 +48,27 @@ export function Topbar({
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
+  const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
+  const canTeam = isTeamAllowedEmail(user?.email);
+  const teamMessages = useTeamMessages(canTeam ? 10 : 0);
+  const latestMessage = teamMessages.data?.messages?.[0] ?? null;
+  const hasNotification =
+    teamLedStatus === "red" || Boolean(latestMessage);
 
   const title =
     titles[pathname] ||
     SIDEBAR_NAV.find((item) => pathname.startsWith(item.href))?.title ||
     "FireGuard";
+
+  const openLatestNotification = () => {
+    if (latestMessage) {
+      router.push(
+        `/notifications?focus=${encodeURIComponent(latestMessage.id)}`
+      );
+      return;
+    }
+    router.push("/notifications");
+  };
 
   return (
     <header className="sticky top-0 z-[60] flex h-14 items-center gap-2 border-b border-border/60 bg-surface/85 px-3 backdrop-blur-2xl sm:gap-3 sm:px-6 lg:px-8">
@@ -92,6 +112,23 @@ export function Topbar({
           aria-label="Search"
         >
           <Search className="h-4 w-4" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative rounded-full"
+          aria-label={
+            latestMessage
+              ? "Open latest notification"
+              : "Open notifications"
+          }
+          onClick={openLatestNotification}
+        >
+          <Bell className={cn("h-4 w-4", hasNotification && "text-ember")} />
+          {hasNotification ? (
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-ember ring-2 ring-surface" />
+          ) : null}
         </Button>
 
         <Button
