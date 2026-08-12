@@ -109,6 +109,7 @@ export function AlertList({
                   {alert.message}
                 </p>
                 <p className="text-xs text-muted-foreground">
+                  {alert.type === "TEAM" ? "From Team FireGuard · " : null}
                   {format(new Date(alert.createdAt), "MMM d, yyyy · HH:mm:ss")}{" "}
                   ·{" "}
                   {formatDistanceToNow(new Date(alert.createdAt), {

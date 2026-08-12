@@ -37,11 +37,11 @@ export async function sendTeamMessageEmails(input: {
   const from =
     process.env.EMAIL_FROM?.trim() || "FireGuard <onboarding@resend.dev>";
   const recipients = [...TEAM_ALLOWED_EMAILS];
-  const subject = `FireGuard team alert from ${input.senderName}`;
+  const subject = "FireGuard team alert from Team FireGuard";
   const text = [
     "FireGuard team message",
     "",
-    `From: ${input.senderName} <${input.senderEmail}>`,
+    "From: Team FireGuard",
     "",
     input.message,
     "",
@@ -54,8 +54,7 @@ export async function sendTeamMessageEmails(input: {
         FireGuard team message
       </p>
       <p style="margin:0 0 16px">
-        <strong>${escapeHtml(input.senderName)}</strong>
-        &lt;${escapeHtml(input.senderEmail)}&gt;
+        <strong>Team FireGuard</strong>
       </p>
       <div style="padding:14px 16px;border:1px solid #e5e5e5;border-radius:12px;background:#fafafa;white-space:pre-wrap">
 ${escapeHtml(input.message)}

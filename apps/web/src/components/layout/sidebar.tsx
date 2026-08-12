@@ -144,8 +144,10 @@ export function Sidebar({ onNavigate, className }: SidebarProps) {
                 key={item.href}
                 item={item}
                 active={
-                  pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`)
+                  item.href === "/notifications"
+                    ? pathname === item.href
+                    : pathname === item.href ||
+                      pathname.startsWith(`${item.href}/`)
                 }
                 onNavigate={onNavigate}
               />

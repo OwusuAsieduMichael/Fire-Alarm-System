@@ -82,18 +82,20 @@ export function useSendTeamMessage() {
   });
 }
 
+export const TEAM_FIREGUARD_LABEL = "Team FireGuard";
+
 export function teamMessageToAlert(message: TeamMessage): Alert {
   return {
     id: `team:${message.id}`,
     deviceId: "",
     type: "TEAM",
     severity: "INFO",
-    title: `Team · ${message.senderName}`,
+    title: TEAM_FIREGUARD_LABEL,
     message: message.body,
     smsStatus: "NONE",
     acknowledged: false,
     createdAt: message.createdAt,
-    senderName: message.senderName,
+    senderName: TEAM_FIREGUARD_LABEL,
     senderEmail: message.senderEmail,
   };
 }

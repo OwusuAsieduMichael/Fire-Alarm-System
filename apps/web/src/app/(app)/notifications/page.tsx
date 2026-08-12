@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
-import { useSearchParams } from "next/navigation";
+import { useMemo, useState, type FormEvent } from "react";
 import { Send } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -35,30 +34,6 @@ const FILTERS: { value: AlertFilter; label: string }[] = [
 ];
 
 export default function NotificationsPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="space-y-3">
-          <p className="metric-label">Inbox</p>
-          <h1 className="section-title">Notifications</h1>
-          <p className="text-sm text-muted-foreground">Loading…</p>
-        </div>
-      }
-    >
-      <NotificationsContent />
-    </Suspense>
-  );
-}
-
-function NotificationsContent() {
-  const searchParams = useSearchParams();
-  const focusParam = searchParams.get("focus");
-  const focusId = focusParam
-    ? focusParam.startsWith("team:")
-      ? focusParam
-      : `team:${focusParam}`
-    : null;
-
   const [filter, setFilter] = useState<AlertFilter>("FIRE");
   const [draft, setDraft] = useState("");
   const [sendingId, setSendingId] = useState<TeamAlertTemplateId | null>(null);
@@ -92,16 +67,6 @@ function NotificationsContent() {
     () => filterAlerts(merged, filter),
     [merged, filter]
   );
-
-  useEffect(() => {
-    if (!focusId || isLoading || teamMessages.isLoading) return;
-    const el = document.getElementById(`alert-${focusId}`);
-    if (!el) return;
-    const timer = window.setTimeout(() => {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 120);
-    return () => window.clearTimeout(timer);
-  }, [focusId, alerts, isLoading, teamMessages.isLoading]);
 
   const onSendTemplate = async (template: TeamAlertTemplate) => {
     if (sendMessage.isPending) return;
@@ -200,7 +165,6 @@ function NotificationsContent() {
       <AlertList
         alerts={alerts}
         loading={isLoading || teamMessages.isLoading}
-        focusId={focusId}
         acknowledgingId={acknowledge.isPending ? acknowledge.variables : null}
         onAcknowledge={(id) => {
           if (id.startsWith("team:")) return;
