@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
-import { Send } from "lucide-react";
+import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { AlertList } from "@/features/notifications/alert-list";
+import { PresetAlertCards } from "@/features/notifications/preset-alert-cards";
 import {
   filterAlerts,
   useAcknowledgeAlert,
@@ -20,6 +20,10 @@ import {
   useTeamMessages,
 } from "@/hooks/use-team-messages";
 import { isTeamAllowedEmail } from "@/lib/team-allowlist";
+import type {
+  TeamAlertTemplate,
+  TeamAlertTemplateId,
+} from "@/lib/team-alert-templates";
 import { useAuthStore } from "@/stores/auth-store";
 import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
 
@@ -30,7 +34,7 @@ const FILTERS: { value: AlertFilter; label: string }[] = [
 
 export default function NotificationsPage() {
   const [filter, setFilter] = useState<AlertFilter>("FIRE");
-  const [draft, setDraft] = useState("");
+  const [sendingId, setSendingId] = useState<TeamAlertTemplateId | null>(null);
   const user = useAuthStore((s) => s.user);
   const canMessage = isTeamAllowedEmail(user?.email);
   const selected = useDeviceStore(selectSelectedDevice);
@@ -62,12 +66,14 @@ export default function NotificationsPage() {
     [merged, filter]
   );
 
-  const onSend = async (event: FormEvent) => {
-    event.preventDefault();
-    const message = draft.trim();
-    if (!message || sendMessage.isPending) return;
-    await sendMessage.mutateAsync(message);
-    setDraft("");
+  const onSendTemplate = async (template: TeamAlertTemplate) => {
+    if (sendMessage.isPending) return;
+    setSendingId(template.id);
+    try {
+      await sendMessage.mutateAsync(template.body);
+    } finally {
+      setSendingId(null);
+    }
   };
 
   return (
@@ -75,7 +81,7 @@ export default function NotificationsPage() {
       <PageHeader
         eyebrow="Inbox"
         title="Notifications"
-        description="Fire and smoke events, plus team messages visible to every operator."
+        description="Send prepared flame and smoke alerts, then review the shared team inbox."
         actions={
           <Button
             variant="outline"
@@ -92,38 +98,11 @@ export default function NotificationsPage() {
       />
 
       {canMessage ? (
-        <form
-          onSubmit={onSend}
-          className="rounded-[1.25rem] border border-border/70 bg-card/90 p-4 shadow-soft sm:p-5"
-        >
-          <label htmlFor="team-message" className="sr-only">
-            Team message
-          </label>
-          <textarea
-            id="team-message"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            rows={3}
-            maxLength={2000}
-            placeholder="Write a message for the FireGuard team…"
-            className="w-full resize-none rounded-2xl border border-border/70 bg-background/80 px-3.5 py-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
-          />
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <p className="text-xs text-muted-foreground">
-              Shows under Fire and Smoke, turns the LED red, and emails every
-              team inbox.
-            </p>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={!draft.trim() || sendMessage.isPending}
-              className="gap-2"
-            >
-              <Send className="h-3.5 w-3.5" />
-              {sendMessage.isPending ? "Sending…" : "Send"}
-            </Button>
-          </div>
-        </form>
+        <PresetAlertCards
+          sendingId={sendingId}
+          disabled={sendMessage.isPending}
+          onSend={onSendTemplate}
+        />
       ) : null}
 
       <SegmentedControl
