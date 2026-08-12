@@ -4,9 +4,7 @@ import {
   Activity,
   Flame,
   Lightbulb,
-  Thermometer,
   Volume2,
-  Wind,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { ConnectionBadge } from "@/components/shared/connection-badge";
@@ -65,7 +63,7 @@ export default function DashboardPage() {
           <h2 className="section-title mt-1">Live sensors</h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-2">
           <SensorCard
             title="Smoke Level"
             icon={Activity}
@@ -88,22 +86,6 @@ export default function DashboardPage() {
             unit={flameOn ? "ALARM" : "CLEAR"}
             statusLabel={flameOn ? "Detected" : "Safe"}
             statusTone={flameOn ? "alarm" : "safe"}
-          />
-          <SensorCard
-            title="Temperature"
-            icon={Thermometer}
-            value={live.temperature}
-            unit="°C"
-            decimals={1}
-            statusTone="info"
-          />
-          <SensorCard
-            title="Humidity"
-            icon={Wind}
-            value={live.humidity}
-            unit="%"
-            decimals={0}
-            statusTone="info"
           />
           <SensorCard
             title="Buzzer"
