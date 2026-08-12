@@ -18,6 +18,7 @@ interface DeviceStore {
   selectedDeviceId: string | null;
   live: LiveDeviceState;
   teamLedStatus: "green" | "red" | "amber";
+  teamLedUpdatedAt: string | null;
   smokeHistory: SmokeHistoryPoint[];
   recentAlerts: Alert[];
   connectionLogs: ConnectionLog[];
@@ -26,7 +27,10 @@ interface DeviceStore {
   setDevices: (devices: Device[]) => void;
   setSelectedDeviceId: (id: string | null) => void;
   setConnectionStatus: (status: ConnectionStatus) => void;
-  setTeamLedStatus: (status: "green" | "red" | "amber") => void;
+  setTeamLedStatus: (
+    status: "green" | "red" | "amber",
+    updatedAt?: string | null
+  ) => void;
   applyLiveReading: (partial: Partial<LiveDeviceState>) => void;
   applyLiveReadingWithHistory: (partial: Partial<LiveDeviceState>) => void;
   setSmokeHistory: (points: SmokeHistoryPoint[]) => void;
@@ -59,6 +63,7 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
   selectedDeviceId: null,
   live: defaultLive,
   teamLedStatus: "green",
+  teamLedUpdatedAt: null,
   smokeHistory: [],
   recentAlerts: [],
   connectionLogs: [],
@@ -76,7 +81,12 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
 
   setConnectionStatus: (connectionStatus) => set({ connectionStatus }),
 
-  setTeamLedStatus: (teamLedStatus) => set({ teamLedStatus }),
+  setTeamLedStatus: (teamLedStatus, updatedAt) =>
+    set((state) => ({
+      teamLedStatus,
+      teamLedUpdatedAt:
+        updatedAt !== undefined ? updatedAt : state.teamLedUpdatedAt,
+    })),
 
   applyLiveReading: (partial) =>
     set((state) => ({
@@ -140,6 +150,7 @@ export const useDeviceStore = create<DeviceStore>((set) => ({
     set({
       live: defaultLive,
       teamLedStatus: "green",
+      teamLedUpdatedAt: null,
       smokeHistory: [],
     }),
 }));

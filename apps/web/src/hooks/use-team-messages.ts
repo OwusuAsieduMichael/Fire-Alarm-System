@@ -12,11 +12,13 @@ type TeamLedStatus = "green" | "red" | "amber";
 interface TeamMessagesResponse {
   messages: TeamMessage[];
   ledStatus: TeamLedStatus;
+  ledUpdatedAt: string | null;
 }
 
 interface TeamSendResponse {
   message: TeamMessage;
   ledStatus: TeamLedStatus;
+  ledUpdatedAt: string;
 }
 
 export function useTeamMessages(limit = 50) {
@@ -34,10 +36,9 @@ export function useTeamMessages(limit = 50) {
   });
 
   useEffect(() => {
-    if (query.data?.ledStatus) {
-      setTeamLedStatus(query.data.ledStatus);
-    }
-  }, [query.data?.ledStatus, setTeamLedStatus]);
+    if (!query.data?.ledStatus) return;
+    setTeamLedStatus(query.data.ledStatus, query.data.ledUpdatedAt ?? null);
+  }, [query.data?.ledStatus, query.data?.ledUpdatedAt, setTeamLedStatus]);
 
   return query;
 }
@@ -51,7 +52,10 @@ export function useSendTeamMessage() {
       return apiClient.post<TeamSendResponse>("/team-messages", { message });
     },
     onSuccess: (data) => {
-      setTeamLedStatus(data.ledStatus || "red");
+      setTeamLedStatus(
+        data.ledStatus || "red",
+        data.ledUpdatedAt || new Date().toISOString()
+      );
       toast.success("Message sent to the team");
       queryClient.invalidateQueries({ queryKey: ["team-messages"] });
     },

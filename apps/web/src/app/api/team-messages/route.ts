@@ -23,30 +23,36 @@ function mapMessage(
   };
 }
 
-async function readLedStatus(
+async function readTeamStatus(
   db: NonNullable<ReturnType<typeof userDb>>
-): Promise<LedStatus> {
+): Promise<{ ledStatus: LedStatus; ledUpdatedAt: string | null }> {
   const { data } = await db
     .from("team_status")
-    .select("led_status")
+    .select("led_status, updated_at")
     .eq("id", 1)
     .maybeSingle();
   const led = data?.led_status;
-  if (led === "red" || led === "amber" || led === "green") return led;
-  return "green";
+  const ledStatus: LedStatus =
+    led === "red" || led === "amber" || led === "green" ? led : "green";
+  return {
+    ledStatus,
+    ledUpdatedAt: data?.updated_at ?? null,
+  };
 }
 
 async function setLedStatus(
   db: NonNullable<ReturnType<typeof userDb>>,
   led: LedStatus
-) {
+): Promise<string> {
   const admin = createSupabaseAdminClient();
   const client = admin ?? db;
+  const updatedAt = new Date().toISOString();
   await client.from("team_status").upsert({
     id: 1,
     led_status: led,
-    updated_at: new Date().toISOString(),
+    updated_at: updatedAt,
   });
+  return updatedAt;
 }
 
 export async function GET(req: Request) {
@@ -98,13 +104,14 @@ export async function GET(req: Request) {
     }
   }
 
-  const ledStatus = await readLedStatus(db);
+  const { ledStatus, ledUpdatedAt } = await readTeamStatus(db);
 
   return json({
     messages: (data || []).map((row) =>
       mapMessage(row, profilesById.get(row.sender_id))
     ),
     ledStatus,
+    ledUpdatedAt,
   });
 }
 
@@ -147,7 +154,7 @@ export async function POST(req: Request) {
     );
   }
 
-  await setLedStatus(db, "red");
+  const ledUpdatedAt = await setLedStatus(db, "red");
 
   return json(
     {
@@ -157,6 +164,7 @@ export async function POST(req: Request) {
         email: user.email,
       }),
       ledStatus: "red" as const,
+      ledUpdatedAt,
     },
     201
   );
