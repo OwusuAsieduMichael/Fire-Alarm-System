@@ -11,6 +11,9 @@ function serializeLive(payload: Record<string, unknown>): Partial<LiveDeviceStat
   return {
     deviceId: (payload.deviceId as string) ?? null,
     smokeLevel: Number(payload.smokeLevel ?? 0),
+    flameLevel: Number(
+      payload.flameLevel ?? (payload.flameDetected ? 1000 : 0)
+    ),
     flameDetected: Boolean(payload.flameDetected),
     temperature:
       payload.temperature === null || payload.temperature === undefined

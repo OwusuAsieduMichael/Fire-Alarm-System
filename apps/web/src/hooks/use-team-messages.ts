@@ -19,6 +19,12 @@ interface TeamSendResponse {
   message: TeamMessage;
   ledStatus: TeamLedStatus;
   ledUpdatedAt: string;
+  email?: {
+    attempted: boolean;
+    sent: number;
+    failed: number;
+    skippedReason?: "not_configured" | "send_failed";
+  };
 }
 
 export function useTeamMessages(limit = 50) {
@@ -56,7 +62,18 @@ export function useSendTeamMessage() {
         data.ledStatus || "red",
         data.ledUpdatedAt || new Date().toISOString()
       );
-      toast.success("Message sent to the team");
+      const email = data.email;
+      if (email?.attempted && email.sent > 0) {
+        toast.success(
+          `Message sent · emailed ${email.sent} team inbox${email.sent === 1 ? "" : "es"}`
+        );
+      } else if (email?.skippedReason === "not_configured") {
+        toast.success("Message sent to the team (email not configured yet)");
+      } else if (email?.attempted && email.sent === 0) {
+        toast.success("Message sent · email delivery failed");
+      } else {
+        toast.success("Message sent to the team");
+      }
       queryClient.invalidateQueries({ queryKey: ["team-messages"] });
     },
     onError: (error: Error) => {

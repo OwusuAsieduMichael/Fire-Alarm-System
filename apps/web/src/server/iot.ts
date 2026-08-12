@@ -169,6 +169,7 @@ export async function ingestTelemetry(input: TelemetryInput) {
   const live: LiveDeviceState = {
     deviceId: device.id,
     smokeLevel: reading.smoke_level,
+    flameLevel: reading.flame_detected ? 1000 : 0,
     flameDetected: reading.flame_detected,
     temperature: reading.temperature ?? null,
     humidity: reading.humidity ?? null,

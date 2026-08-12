@@ -85,7 +85,8 @@ export function mapLog(row: LogRow): ConnectionLog {
 export function offlineLive(device?: Device | null): LiveDeviceState {
   return {
     deviceId: device?.id ?? null,
-    smokeLevel: 0,
+    smokeLevel: 60,
+    flameLevel: 1000,
     flameDetected: false,
     temperature: null,
     humidity: null,
@@ -133,6 +134,7 @@ export function readingToLive(
   return {
     deviceId: device.id,
     smokeLevel: reading.smokeLevel,
+    flameLevel: reading.flameDetected ? 1000 : 0,
     flameDetected: reading.flameDetected,
     temperature: reading.temperature ?? null,
     humidity: reading.humidity ?? null,

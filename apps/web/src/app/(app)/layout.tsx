@@ -8,6 +8,7 @@ import { useLivePolling } from "@/hooks/use-live-polling";
 import { useSocket } from "@/hooks/use-socket";
 import { useTeamMessages } from "@/hooks/use-team-messages";
 import { useTeamBuzzer } from "@/hooks/use-team-buzzer";
+import { useTeamAlertSim } from "@/hooks/use-team-alert-sim";
 import { isTeamAllowedEmail } from "@/lib/team-allowlist";
 import { useAuthStore } from "@/stores/auth-store";
 
@@ -19,6 +20,8 @@ function RealtimeBridge() {
   useLivePolling(!USE_EXTERNAL_API);
   // Keep shared team LED in sync for every allowlisted operator.
   useTeamMessages(isTeamAllowedEmail(email) ? 20 : 0);
+  // Mirror LCD S/F values into live sensors + trend chart.
+  useTeamAlertSim();
   // Audible beep while team LED is red after a message.
   useTeamBuzzer();
   return null;

@@ -1,5 +1,6 @@
 import { getBearer, error, isResponse, json, requireUser } from "@/server/http";
 import { isTeamAllowedEmail } from "@/lib/team-allowlist";
+import { sendTeamMessageEmails } from "@/lib/team-mail";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { userDb } from "@/server/supabase-data";
 import type { TeamMessage } from "@/types";
@@ -156,6 +157,12 @@ export async function POST(req: Request) {
 
   const ledUpdatedAt = await setLedStatus(db, "red");
 
+  const email = await sendTeamMessageEmails({
+    senderName: user.name || "Team member",
+    senderEmail: user.email,
+    message,
+  });
+
   return json(
     {
       message: mapMessage(data, {
@@ -165,6 +172,7 @@ export async function POST(req: Request) {
       }),
       ledStatus: "red" as const,
       ledUpdatedAt,
+      email,
     },
     201
   );

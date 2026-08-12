@@ -16,6 +16,7 @@ import { SmokeChart } from "@/features/dashboard/smoke-chart";
 import { RecentAlerts } from "@/features/dashboard/recent-alerts";
 import { useDevices, useSensorHistory } from "@/hooks/use-sensors";
 import { useAlerts } from "@/hooks/use-alerts";
+import { TEAM_SMOKE_THRESHOLD } from "@/lib/team-alert-sim";
 import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
 
 export default function DashboardPage() {
@@ -27,18 +28,25 @@ export default function DashboardPage() {
   useSensorHistory(selected?.id, 60);
   useAlerts({ deviceId: selected?.id, limit: 20 });
 
-  const threshold = selected?.smokeThreshold ?? 300;
+  const teamDriven =
+    teamLedStatus === "red" || !live.realDeviceConnected;
+  const threshold = teamDriven
+    ? TEAM_SMOKE_THRESHOLD
+    : (selected?.smokeThreshold ?? TEAM_SMOKE_THRESHOLD);
   const smokeTone =
     live.smokeLevel > threshold
       ? "alarm"
       : live.smokeLevel > threshold * 0.7
         ? "warning"
-        : "safe";
+        : teamLedStatus === "red"
+          ? "warning"
+          : "safe";
   const buzzerOn = live.buzzerActive || teamLedStatus === "red";
   const ledStatus =
     teamLedStatus === "red" || teamLedStatus === "amber"
       ? teamLedStatus
       : live.ledStatus;
+  const flameOn = live.flameDetected || teamLedStatus === "red";
 
   return (
     <div className="space-y-5 sm:space-y-7">
@@ -63,17 +71,23 @@ export default function DashboardPage() {
             icon={Activity}
             value={live.smokeLevel}
             unit="ppm"
-            statusLabel={smokeTone === "alarm" ? "Elevated" : "Nominal"}
+            statusLabel={
+              smokeTone === "alarm"
+                ? "Elevated"
+                : teamLedStatus === "red"
+                  ? "Alert"
+                  : "Nominal"
+            }
             statusTone={smokeTone}
           />
           <SensorCard
             title="Flame Detection"
             icon={Flame}
-            value={live.flameDetected ? 1 : 0}
+            value={live.flameLevel}
             decimals={0}
-            unit={live.flameDetected ? "DETECTED" : "CLEAR"}
-            statusLabel={live.flameDetected ? "Alarm" : "Safe"}
-            statusTone={live.flameDetected ? "alarm" : "safe"}
+            unit={flameOn ? "ALARM" : "CLEAR"}
+            statusLabel={flameOn ? "Detected" : "Safe"}
+            statusTone={flameOn ? "alarm" : "safe"}
           />
           <SensorCard
             title="Temperature"

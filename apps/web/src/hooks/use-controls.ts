@@ -51,30 +51,53 @@ export function useTestAlarm() {
 export function useResetAlarm() {
   const queryClient = useQueryClient();
   const applyLiveReading = useDeviceStore((s) => s.applyLiveReading);
+  const setTeamLedStatus = useDeviceStore((s) => s.setTeamLedStatus);
+  const setSmokeHistory = useDeviceStore((s) => s.setSmokeHistory);
   const pushSocketLog = useDeviceStore((s) => s.pushSocketLog);
 
   return useMutation<ControlResult, Error, void>({
     mutationFn: async () => {
-      const id = resolveDeviceId();
-      if (!id) throw new Error("No device selected");
+      // Always clear shared team alert (LED / LCD / buzzer / sensors).
+      const team = await apiClient.post<{
+        ledStatus: "green" | "red" | "amber";
+        ledUpdatedAt: string;
+      }>("/team-status", { ledStatus: "green" });
+      setTeamLedStatus(team.ledStatus || "green", team.ledUpdatedAt);
       applyLiveReading({
         alarmActive: false,
         buzzerActive: false,
         ledStatus: "green",
         flameDetected: false,
-        lcdMessage: "SYSTEM SAFE",
+        smokeLevel: 60,
+        flameLevel: 1000,
+        lcdMessage: "Fire Alarm Sys",
       });
-      pushSocketLog(`Control: reset-alarm → ${id}`);
-      return apiClient.post<ControlResult>("/controls/reset-alarm", {
-        deviceId: id,
-      });
+      const now = Date.now();
+      setSmokeHistory(
+        Array.from({ length: 12 }, (_, i) => ({
+          timestamp: new Date(now - (11 - i) * 5000).toISOString(),
+          smokeLevel: 60,
+        }))
+      );
+
+      const id = resolveDeviceId();
+      if (id) {
+        pushSocketLog(`Control: reset-alarm → ${id}`);
+        await apiClient.post<ControlResult>("/controls/reset-alarm", {
+          deviceId: id,
+        });
+      } else {
+        pushSocketLog("Control: system reset (team alert cleared)");
+      }
+      return { success: true, message: "System reset to normal" };
     },
     onSuccess: () => {
-      toast.success("Alarm reset");
+      toast.success("System reset to normal");
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
+      queryClient.invalidateQueries({ queryKey: ["team-messages"] });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to reset alarm");
+      toast.error(error.message || "Failed to reset system");
     },
   });
 }

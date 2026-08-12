@@ -94,6 +94,8 @@ export type ConnectionStatus =
 export interface LiveDeviceState {
   deviceId: string | null;
   smokeLevel: number;
+  /** Analog flame reading (mirrors LCD F: value in team alert sim). */
+  flameLevel: number;
   flameDetected: boolean;
   temperature: number | null;
   humidity: number | null;

@@ -110,7 +110,8 @@ export default function NotificationsPage() {
           />
           <div className="mt-3 flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              Shows under Fire and Smoke for everyone. Turns the LED red.
+              Shows under Fire and Smoke, turns the LED red, and emails every
+              team inbox.
             </p>
             <Button
               type="submit"

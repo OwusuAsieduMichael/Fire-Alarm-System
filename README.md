@@ -24,6 +24,7 @@ ESP32   → Next.js /api/iot/telemetry (x-device-key) → Supabase
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY` ← required for ESP32 ingest + controls
+   - `RESEND_API_KEY` + `EMAIL_FROM` ← optional; emails team inboxes on Notifications send
 4. Do **not** set `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_WS_URL` / `GAS_SCRIPT_URL`
 
 ## Run the system (ESP32 starts the live function)

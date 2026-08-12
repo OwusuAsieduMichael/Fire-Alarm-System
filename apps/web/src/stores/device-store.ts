@@ -45,14 +45,15 @@ interface DeviceStore {
 
 const defaultLive: LiveDeviceState = {
   deviceId: null,
-  smokeLevel: 0,
+  smokeLevel: 60,
+  flameLevel: 1000,
   flameDetected: false,
   temperature: null,
   humidity: null,
   buzzerActive: false,
   ledStatus: "green",
   alarmActive: false,
-  lcdMessage: "Waiting for ESP32…",
+  lcdMessage: "Fire Alarm Sys",
   status: "OFFLINE",
   lastSeen: null,
   realDeviceConnected: false,

@@ -22,6 +22,7 @@ import { useDeviceStore } from "@/stores/device-store";
 export default function ControlsPage() {
   useDevices();
   const live = useDeviceStore((s) => s.live);
+  const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
   const testAlarm = useTestAlarm();
   const resetAlarm = useResetAlarm();
   const emergency = useEmergency();
@@ -36,13 +37,27 @@ export default function ControlsPage() {
         actions={
           <div className="flex flex-wrap gap-2">
             <StatusPill
-              label={live.alarmActive ? "Alarm active" : "System calm"}
-              tone={live.alarmActive ? "alarm" : "safe"}
+              label={
+                live.alarmActive || teamLedStatus === "red"
+                  ? "Alarm active"
+                  : "System calm"
+              }
+              tone={
+                live.alarmActive || teamLedStatus === "red" ? "alarm" : "safe"
+              }
               pulse={false}
             />
             <StatusPill
-              label={live.buzzerActive ? "Buzzer on" : "Buzzer off"}
-              tone={live.buzzerActive ? "warning" : "neutral"}
+              label={
+                live.buzzerActive || teamLedStatus === "red"
+                  ? "Buzzer on"
+                  : "Buzzer off"
+              }
+              tone={
+                live.buzzerActive || teamLedStatus === "red"
+                  ? "warning"
+                  : "neutral"
+              }
             />
           </div>
         }
@@ -64,12 +79,12 @@ export default function ControlsPage() {
           index={0}
         />
         <ControlActionCard
-          title="Reset Alarm"
-          description="Clear active alarms and return actuators to a safe idle state."
+          title="Reset System"
+          description="Return LED, LCD, buzzer, and live sensors to the normal safe state until a new team message arrives."
           icon={CircleStop}
           tone="calm"
-          confirmTitle="Reset the alarm?"
-          confirmDescription="Flame and alarm flags will be cleared on the device."
+          confirmTitle="Reset everything to normal?"
+          confirmDescription="Clears the shared red alert, silences the buzzer, and restores Fire Alarm Sys with S:60 F:1000. Alerts return only when someone sends a new team message."
           confirmLabel="Reset now"
           loading={resetAlarm.isPending}
           onConfirm={async () => {

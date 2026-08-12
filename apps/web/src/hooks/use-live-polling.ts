@@ -67,22 +67,32 @@ export function useLivePolling(enabled = true) {
         const data = await apiClient.get<LivePayload>(path);
         if (cancelled) return;
         onlineRef.current = Boolean(data.live.realDeviceConnected);
+        const teamLed = useDeviceStore.getState().teamLedStatus;
+        const teamAlertOwnsSensors = teamLed === "red";
+
         applyLiveReading({
           deviceId: data.live.deviceId,
-          smokeLevel: data.live.smokeLevel,
-          flameDetected: data.live.flameDetected,
           temperature: data.live.temperature,
           humidity: data.live.humidity,
-          buzzerActive: data.live.buzzerActive,
-          ledStatus: data.live.ledStatus,
-          alarmActive: data.live.alarmActive,
-          lcdMessage: data.live.lcdMessage,
           status: data.live.status,
           lastSeen: data.live.lastSeen,
           realDeviceConnected: data.live.realDeviceConnected,
+          // Team message alert owns smoke/flame/actuators until Controls reset.
+          ...(teamAlertOwnsSensors
+            ? {}
+            : {
+                smokeLevel: data.live.smokeLevel,
+                flameDetected: data.live.flameDetected,
+                buzzerActive: data.live.buzzerActive,
+                ledStatus: data.live.ledStatus,
+                alarmActive: data.live.alarmActive,
+                lcdMessage: data.live.lcdMessage,
+              }),
         });
         setRecentAlerts(data.recentAlerts);
-        setSmokeHistory(data.smokeHistory ?? []);
+        if (!teamAlertOwnsSensors && data.live.realDeviceConnected) {
+          setSmokeHistory(data.smokeHistory ?? []);
+        }
         setConnectionStatus("connected");
       } catch {
         if (!cancelled) {

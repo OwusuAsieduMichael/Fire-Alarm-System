@@ -42,7 +42,7 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
           <p className="metric-label">Trend</p>
           <CardTitle className="mt-1.5">Smoke history</CardTitle>
           <p className="mt-1.5 text-[13px] text-muted-foreground">
-            Live readings · threshold {threshold} ppm
+            Live readings · smoke threshold {threshold}
           </p>
         </div>
       </CardHeader>
@@ -53,7 +53,7 @@ export function SmokeChart({ loading, threshold = 300 }: SmokeChartProps) {
           <EmptyState
             icon={<Activity className="h-5 w-5" />}
             title="Waiting for sensor data"
-            description="Smoke history appears once the ESP32 starts streaming."
+            description="Smoke history tracks live and message-driven readings."
             className="h-full border-0 bg-transparent py-8 shadow-none"
           />
         ) : (

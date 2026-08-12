@@ -9,8 +9,10 @@ import { cn } from "@/lib/utils";
 
 export function StatusHero() {
   const live = useDeviceStore((s) => s.live);
+  const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
   const connectionStatus = useDeviceStore((s) => s.connectionStatus);
-  const isAlarm = live.alarmActive || live.flameDetected;
+  const isAlarm =
+    live.alarmActive || live.flameDetected || teamLedStatus === "red";
   const online = live.status === "ONLINE" || connectionStatus === "connected";
   const smokePct = Math.min(100, Math.max(0, (live.smokeLevel / 1000) * 100));
 
