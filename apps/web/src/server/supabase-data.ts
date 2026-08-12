@@ -28,6 +28,7 @@ export function mapDevice(row: DeviceRow, counts?: { alerts?: number; readings?:
     firmwareVersion: row.firmware_version,
     lastSeen: row.last_seen,
     smokeThreshold: row.smoke_threshold,
+    flameThreshold: row.flame_threshold ?? 1000,
     smokeCalibration: row.smoke_calibration,
     ownerId: row.owner_id ?? null,
     createdAt: row.created_at,

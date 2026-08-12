@@ -82,7 +82,9 @@ export async function POST(req: Request) {
       device_key: deviceKey,
       status: "OFFLINE",
       smoke_threshold:
-        typeof body.smokeThreshold === "number" ? body.smokeThreshold : 300,
+        typeof body.smokeThreshold === "number" ? body.smokeThreshold : 60,
+      flame_threshold:
+        typeof body.flameThreshold === "number" ? body.flameThreshold : 1000,
       smoke_calibration: 0,
       firmware_version: "pending",
     })

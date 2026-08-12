@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
@@ -16,32 +15,31 @@ import { Lock } from "lucide-react";
 
 interface ThresholdControlProps {
   smokeThreshold: number;
-  smokeCalibration: number;
+  flameThreshold: number;
   canWrite: boolean;
   loading?: boolean;
   onSave: (values: {
     smokeThreshold: number;
-    smokeCalibration: number;
+    flameThreshold: number;
   }) => void;
 }
 
 export function ThresholdControl({
   smokeThreshold,
-  smokeCalibration,
+  flameThreshold,
   canWrite,
   loading,
   onSave,
 }: ThresholdControlProps) {
-  const [threshold, setThreshold] = useState(smokeThreshold);
-  const [calibration, setCalibration] = useState(smokeCalibration);
+  const [smoke, setSmoke] = useState(smokeThreshold);
+  const [flame, setFlame] = useState(flameThreshold);
 
   useEffect(() => {
-    setThreshold(smokeThreshold);
-    setCalibration(smokeCalibration);
-  }, [smokeThreshold, smokeCalibration]);
+    setSmoke(smokeThreshold);
+    setFlame(flameThreshold);
+  }, [smokeThreshold, flameThreshold]);
 
-  const dirty =
-    threshold !== smokeThreshold || calibration !== smokeCalibration;
+  const dirty = smoke !== smokeThreshold || flame !== flameThreshold;
 
   return (
     <TooltipProvider>
@@ -58,24 +56,24 @@ export function ThresholdControl({
                   <TooltipTrigger asChild>
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                       <Lock className="h-3.5 w-3.5" />
-                      Developer only
+                      Locked
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    Only developers can change the smoke threshold.
+                    Only the device owner or a developer can change thresholds.
                   </TooltipContent>
                 </Tooltip>
               ) : null}
             </div>
             <p className="text-xs text-muted-foreground">
-              Alarm triggers when smoke exceeds this level (ppm).
+              LCD / sensors use this as the smoke baseline (S value).
             </p>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="flex items-end justify-between">
-              <Label htmlFor="smoke-threshold">Threshold</Label>
+              <Label htmlFor="smoke-threshold">Smoke</Label>
               <span className="sensor-value text-2xl font-semibold tracking-tight">
-                {threshold}
+                {smoke}
                 <span className="ml-1 text-sm font-medium text-muted-foreground">
                   ppm
                 </span>
@@ -83,31 +81,18 @@ export function ThresholdControl({
             </div>
             <Slider
               id="smoke-threshold"
-              min={50}
-              max={1000}
-              step={10}
-              value={[threshold]}
+              min={20}
+              max={500}
+              step={5}
+              value={[smoke]}
               disabled={!canWrite}
-              onValueChange={([v]) => setThreshold(v)}
+              onValueChange={([v]) => setSmoke(v)}
               aria-label="Smoke threshold"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>Sensitive</span>
               <span>Relaxed</span>
             </div>
-            {canWrite ? (
-              <Button
-                disabled={!dirty || loading}
-                onClick={() =>
-                  onSave({
-                    smokeThreshold: threshold,
-                    smokeCalibration: calibration,
-                  })
-                }
-              >
-                {loading ? "Saving…" : "Save threshold"}
-              </Button>
-            ) : null}
           </CardContent>
         </Card>
 
@@ -115,51 +100,66 @@ export function ThresholdControl({
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between gap-2">
               <div>
-                <p className="metric-label">Sensor</p>
-                <CardTitle className="mt-1.5">Calibration</CardTitle>
+                <p className="metric-label">Detection</p>
+                <CardTitle className="mt-1.5">Flame threshold</CardTitle>
               </div>
               {!canWrite ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                       <Lock className="h-3.5 w-3.5" />
-                      Developer only
+                      Locked
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    Calibration offset can only be edited by developers.
+                    Only the device owner or a developer can change thresholds.
                   </TooltipContent>
                 </Tooltip>
               ) : null}
             </div>
             <p className="text-xs text-muted-foreground">
-              Offset applied to raw MQ-2 smoke sensor readings.
+              LCD / sensors use this as the flame baseline (F value).
             </p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="calibration">Calibration offset</Label>
-              <Input
-                id="calibration"
-                type="number"
-                value={calibration}
-                disabled={!canWrite}
-                onChange={(e) => setCalibration(Number(e.target.value))}
-              />
+          <CardContent className="space-y-5">
+            <div className="flex items-end justify-between">
+              <Label htmlFor="flame-threshold">Flame</Label>
+              <span className="sensor-value text-2xl font-semibold tracking-tight">
+                {flame}
+              </span>
             </div>
+            <Slider
+              id="flame-threshold"
+              min={200}
+              max={2000}
+              step={10}
+              value={[flame]}
+              disabled={!canWrite}
+              onValueChange={([v]) => setFlame(v)}
+              aria-label="Flame threshold"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Sensitive</span>
+              <span>Relaxed</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {canWrite ? (
+          <div className="lg:col-span-2">
             <Button
-              disabled={!canWrite || !dirty || loading}
+              disabled={!dirty || loading}
               onClick={() =>
                 onSave({
-                  smokeThreshold: threshold,
-                  smokeCalibration: calibration,
+                  smokeThreshold: smoke,
+                  flameThreshold: flame,
                 })
               }
             >
-              {loading ? "Saving…" : "Save calibration"}
+              {loading ? "Saving…" : "Save thresholds"}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        ) : null}
       </div>
     </TooltipProvider>
   );

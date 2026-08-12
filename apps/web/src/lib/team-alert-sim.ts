@@ -31,17 +31,21 @@ function fluctuateUp(
 export function resolveTeamAlertState(
   teamLedStatus: TeamLedStatus,
   teamLedUpdatedAt: string | null,
-  nowMs = Date.now()
+  nowMs = Date.now(),
+  thresholds?: { smoke?: number; flame?: number }
 ): TeamAlertSnapshot {
+  const smokeBase = thresholds?.smoke ?? TEAM_SMOKE_THRESHOLD;
+  const flameBase = thresholds?.flame ?? TEAM_FLAME_THRESHOLD;
+
   if (teamLedStatus !== "red") {
     return {
       phase: "safe",
-      smoke: TEAM_SMOKE_THRESHOLD,
-      flame: TEAM_FLAME_THRESHOLD,
+      smoke: smokeBase,
+      flame: flameBase,
       flameDetected: false,
       alarmActive: false,
       lcdLine1: "Fire Alarm Sys",
-      lcdLine2: `S:${TEAM_SMOKE_THRESHOLD} F:${TEAM_FLAME_THRESHOLD}`,
+      lcdLine2: `S:${smokeBase} F:${flameBase}`,
     };
   }
 
@@ -53,18 +57,18 @@ export function resolveTeamAlertState(
   if (elapsed < TEAM_FIRE_PHASE_MS) {
     return {
       phase: "fire",
-      smoke: TEAM_SMOKE_THRESHOLD,
-      flame: TEAM_FLAME_THRESHOLD,
+      smoke: smokeBase,
+      flame: flameBase,
       flameDetected: true,
       alarmActive: true,
       lcdLine1: "Fire Detected",
-      lcdLine2: `S:${TEAM_SMOKE_THRESHOLD} F:${TEAM_FLAME_THRESHOLD}`,
+      lcdLine2: `S:${smokeBase} F:${flameBase}`,
     };
   }
 
   const smokePhaseSec = Math.floor((elapsed - TEAM_FIRE_PHASE_MS) / 1000);
-  const smoke = fluctuateUp(TEAM_SMOKE_THRESHOLD, smokePhaseSec, 1.4, 4);
-  const flame = fluctuateUp(TEAM_FLAME_THRESHOLD, smokePhaseSec, 3.2, 12);
+  const smoke = fluctuateUp(smokeBase, smokePhaseSec, 1.4, 4);
+  const flame = fluctuateUp(flameBase, smokePhaseSec, 3.2, 12);
 
   return {
     phase: "smoke",

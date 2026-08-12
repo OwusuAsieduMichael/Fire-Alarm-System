@@ -26,7 +26,7 @@ export default function SettingsPage() {
       <PageHeader
         eyebrow="Preferences"
         title="Settings"
-        description="Appearance, thresholds, calibration, and device configuration."
+        description="Adjust smoke and flame thresholds used by the LCD and live sensors."
       />
 
       <ThemeSettings />
@@ -34,8 +34,8 @@ export default function SettingsPage() {
       <RegisterDeviceCard />
 
       <ThresholdControl
-        smokeThreshold={selected?.smokeThreshold ?? 300}
-        smokeCalibration={selected?.smokeCalibration ?? 0}
+        smokeThreshold={selected?.smokeThreshold ?? 60}
+        flameThreshold={selected?.flameThreshold ?? 1000}
         canWrite={canWrite}
         loading={updateDevice.isPending}
         onSave={(values) => {
@@ -44,52 +44,24 @@ export default function SettingsPage() {
         }}
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-3">
-            <p className="metric-label">Network</p>
-            <CardTitle className="mt-1.5">Wi‑Fi status</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-1 text-sm">
-            <Row label="SSID" value={selected?.wifiSsid ?? "—"} />
-            <Row label="IP Address" value={selected?.ipAddress ?? "—"} mono />
-            <div className="flex items-center justify-between gap-3 rounded-xl px-2 py-2.5">
-              <span className="text-muted-foreground">Link</span>
-              <StatusPill
-                label={live.status}
-                tone={live.status === "ONLINE" ? "safe" : "offline"}
-                pulse={live.status === "ONLINE"}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <p className="metric-label">System</p>
-            <CardTitle className="mt-1.5">Configuration</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-1 text-sm">
-            <Row label="Device" value={selected?.name ?? "—"} />
-            <Row
-              label="Firmware"
-              value={selected?.firmwareVersion ?? "—"}
-              mono
+      <Card>
+        <CardHeader className="pb-3">
+          <p className="metric-label">Network</p>
+          <CardTitle className="mt-1.5">Wi‑Fi status</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1 text-sm">
+          <Row label="SSID" value={selected?.wifiSsid ?? "—"} />
+          <Row label="IP Address" value={selected?.ipAddress ?? "—"} mono />
+          <div className="flex items-center justify-between gap-3 rounded-xl px-2 py-2.5">
+            <span className="text-muted-foreground">Link</span>
+            <StatusPill
+              label={live.status}
+              tone={live.status === "ONLINE" ? "safe" : "offline"}
+              pulse={live.status === "ONLINE"}
             />
-            <Row label="Device key" value={selected?.deviceKey ?? "—"} mono />
-            <Row
-              label="Write access"
-              value={
-                canWrite
-                  ? user?.role === "DEVELOPER"
-                    ? "Developer"
-                    : "Owner"
-                  : "Read-only"
-              }
-            />
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

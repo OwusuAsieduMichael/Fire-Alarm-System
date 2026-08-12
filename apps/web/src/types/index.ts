@@ -23,6 +23,7 @@ export interface Device {
   firmwareVersion?: string | null;
   lastSeen?: string | null;
   smokeThreshold: number;
+  flameThreshold: number;
   smokeCalibration: number;
   ownerId?: string | null;
   createdAt?: string;

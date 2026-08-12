@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { resolveTeamAlertState } from "@/lib/team-alert-sim";
-import { useDeviceStore } from "@/stores/device-store";
+import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
 
 /**
  * Keeps live sensors, LCD values, and the smoke trend chart aligned with
@@ -11,19 +11,25 @@ import { useDeviceStore } from "@/stores/device-store";
 export function useTeamAlertSim() {
   const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
   const teamLedUpdatedAt = useDeviceStore((s) => s.teamLedUpdatedAt);
+  const selected = useDeviceStore(selectSelectedDevice);
+  const smokeThreshold = selected?.smokeThreshold;
+  const flameThreshold = selected?.flameThreshold;
   const lastPhaseRef = useRef<string | null>(null);
 
   useEffect(() => {
     const tick = () => {
       const state = useDeviceStore.getState();
+      const device = selectSelectedDevice(state);
       const snap = resolveTeamAlertState(
         state.teamLedStatus,
         state.teamLedUpdatedAt,
-        Date.now()
+        Date.now(),
+        {
+          smoke: device?.smokeThreshold,
+          flame: device?.flameThreshold,
+        }
       );
 
-      // Drive presentation sensors from the team alert sim whenever the
-      // shared LED is red, or when no ESP32 is streaming yet.
       const driveSim =
         state.teamLedStatus === "red" || !state.live.realDeviceConnected;
 
@@ -50,7 +56,6 @@ export function useTeamAlertSim() {
           humidity: state.live.humidity,
         });
       } else if (lastPhaseRef.current !== "safe") {
-        // Just returned to safe — seed a calm baseline trend.
         const now = Date.now();
         state.setSmokeHistory(
           Array.from({ length: 12 }, (_, i) => ({
@@ -73,5 +78,5 @@ export function useTeamAlertSim() {
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, [teamLedStatus, teamLedUpdatedAt]);
+  }, [teamLedStatus, teamLedUpdatedAt, smokeThreshold, flameThreshold]);
 }

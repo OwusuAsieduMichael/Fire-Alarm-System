@@ -51,7 +51,8 @@ export async function POST(req: Request) {
       name: "FireGuard Sensor",
       device_key: deviceKey,
       status: "OFFLINE",
-      smoke_threshold: 300,
+      smoke_threshold: 60,
+      flame_threshold: 1000,
       smoke_calibration: 0,
       firmware_version: "pending",
     })

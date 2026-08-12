@@ -52,6 +52,7 @@ export function useUpdateDeviceSettings() {
     }: {
       deviceId: string;
       smokeThreshold?: number;
+      flameThreshold?: number;
       smokeCalibration?: number;
       wifiSsid?: string;
       name?: string;

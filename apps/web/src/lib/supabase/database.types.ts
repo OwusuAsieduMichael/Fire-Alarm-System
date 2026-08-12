@@ -54,6 +54,7 @@ export type Database = {
           firmware_version: string | null;
           last_seen: string | null;
           smoke_threshold: number;
+          flame_threshold: number;
           smoke_calibration: number;
           created_at: string;
           updated_at: string;
@@ -69,6 +70,7 @@ export type Database = {
           firmware_version?: string | null;
           last_seen?: string | null;
           smoke_threshold?: number;
+          flame_threshold?: number;
           smoke_calibration?: number;
           created_at?: string;
           updated_at?: string;
@@ -84,6 +86,7 @@ export type Database = {
           firmware_version?: string | null;
           last_seen?: string | null;
           smoke_threshold?: number;
+          flame_threshold?: number;
           smoke_calibration?: number;
           created_at?: string;
           updated_at?: string;

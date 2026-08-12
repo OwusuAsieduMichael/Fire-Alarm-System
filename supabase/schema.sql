@@ -53,7 +53,8 @@ create table if not exists public.devices (
   ip_address text,
   firmware_version text,
   last_seen timestamptz,
-  smoke_threshold double precision not null default 300,
+  smoke_threshold double precision not null default 60,
+  flame_threshold double precision not null default 1000,
   smoke_calibration double precision not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -307,6 +308,7 @@ insert into public.devices (
   status,
   firmware_version,
   smoke_threshold,
+  flame_threshold,
   smoke_calibration
 )
 values (
@@ -315,7 +317,8 @@ values (
   'FG-ESP32-DEMO-001',
   'OFFLINE',
   '1.0.0',
-  300,
+  60,
+  1000,
   0
 )
 on conflict (device_key) do nothing;

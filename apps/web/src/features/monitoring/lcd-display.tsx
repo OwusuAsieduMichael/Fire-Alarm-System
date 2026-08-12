@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { resolveTeamAlertState } from "@/lib/team-alert-sim";
-import { useDeviceStore } from "@/stores/device-store";
+import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
 
 function padLine(text: string, width = 16): string {
   const clean = (text || "").slice(0, width);
@@ -14,6 +14,7 @@ function padLine(text: string, width = 16): string {
 export function LcdDisplay() {
   const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
   const teamLedUpdatedAt = useDeviceStore((s) => s.teamLedUpdatedAt);
+  const selected = useDeviceStore(selectSelectedDevice);
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
@@ -24,7 +25,11 @@ export function LcdDisplay() {
   const { lcdLine1, lcdLine2 } = resolveTeamAlertState(
     teamLedStatus,
     teamLedUpdatedAt,
-    nowMs
+    nowMs,
+    {
+      smoke: selected?.smokeThreshold,
+      flame: selected?.flameThreshold,
+    }
   );
   const display1 = padLine(lcdLine1);
   const display2 = padLine(lcdLine2);
