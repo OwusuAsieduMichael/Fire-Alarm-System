@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
+import { Send } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { SegmentedControl } from "@/components/ui/segmented-control";
@@ -34,6 +35,7 @@ const FILTERS: { value: AlertFilter; label: string }[] = [
 
 export default function NotificationsPage() {
   const [filter, setFilter] = useState<AlertFilter>("FIRE");
+  const [draft, setDraft] = useState("");
   const [sendingId, setSendingId] = useState<TeamAlertTemplateId | null>(null);
   const user = useAuthStore((s) => s.user);
   const canMessage = isTeamAllowedEmail(user?.email);
@@ -76,12 +78,20 @@ export default function NotificationsPage() {
     }
   };
 
+  const onSendCustom = async (event: FormEvent) => {
+    event.preventDefault();
+    const message = draft.trim();
+    if (!message || sendMessage.isPending) return;
+    await sendMessage.mutateAsync(message);
+    setDraft("");
+  };
+
   return (
     <div className="space-y-7">
       <PageHeader
         eyebrow="Inbox"
         title="Notifications"
-        description="Send prepared flame and smoke alerts, then review the shared team inbox."
+        description="Send prepared flame and smoke alerts, or write a custom team message."
         actions={
           <Button
             variant="outline"
@@ -98,11 +108,51 @@ export default function NotificationsPage() {
       />
 
       {canMessage ? (
-        <PresetAlertCards
-          sendingId={sendingId}
-          disabled={sendMessage.isPending}
-          onSend={onSendTemplate}
-        />
+        <div className="space-y-5">
+          <PresetAlertCards
+            sendingId={sendingId}
+            disabled={sendMessage.isPending}
+            onSend={onSendTemplate}
+          />
+
+          <form
+            onSubmit={onSendCustom}
+            className="rounded-[1.25rem] border border-border/70 bg-card/90 p-4 shadow-soft sm:p-5"
+          >
+            <p className="metric-label">Custom message</p>
+            <h2 className="section-title mt-1 text-base sm:text-lg">
+              Write your own
+            </h2>
+            <label htmlFor="team-message" className="sr-only">
+              Custom team message
+            </label>
+            <textarea
+              id="team-message"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              placeholder="Write a custom message for the FireGuard team…"
+              className="mt-3 w-full resize-none rounded-2xl border border-border/70 bg-background/80 px-3.5 py-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                Optional. Same inbox, LED, and email path as prepared alerts.
+              </p>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={
+                  !draft.trim() || sendMessage.isPending || Boolean(sendingId)
+                }
+                className="gap-2"
+              >
+                <Send className="h-3.5 w-3.5" />
+                {sendMessage.isPending && !sendingId ? "Sending…" : "Send"}
+              </Button>
+            </div>
+          </form>
+        </div>
       ) : null}
 
       <SegmentedControl
