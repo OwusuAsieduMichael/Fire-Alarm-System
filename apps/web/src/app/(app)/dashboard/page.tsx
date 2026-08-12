@@ -20,6 +20,7 @@ import { useDeviceStore, selectSelectedDevice } from "@/stores/device-store";
 
 export default function DashboardPage() {
   const live = useDeviceStore((s) => s.live);
+  const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
   const selected = useDeviceStore(selectSelectedDevice);
 
   useDevices();
@@ -33,6 +34,11 @@ export default function DashboardPage() {
       : live.smokeLevel > threshold * 0.7
         ? "warning"
         : "safe";
+  const buzzerOn = live.buzzerActive || teamLedStatus === "red";
+  const ledStatus =
+    teamLedStatus === "red" || teamLedStatus === "amber"
+      ? teamLedStatus
+      : live.ledStatus;
 
   return (
     <div className="space-y-5 sm:space-y-7">
@@ -88,21 +94,21 @@ export default function DashboardPage() {
           <SensorCard
             title="Buzzer"
             icon={Volume2}
-            value={live.buzzerActive ? 1 : 0}
+            value={buzzerOn ? 1 : 0}
             decimals={0}
-            unit={live.buzzerActive ? "ON" : "OFF"}
-            statusLabel={live.buzzerActive ? "Active" : "Idle"}
-            statusTone={live.buzzerActive ? "warning" : "safe"}
+            unit={buzzerOn ? "ON" : "OFF"}
+            statusLabel={buzzerOn ? "Active" : "Idle"}
+            statusTone={buzzerOn ? "warning" : "safe"}
           />
           <SensorCard
             title="LED Status"
             icon={Lightbulb}
             value={null}
-            statusLabel={live.ledStatus.toUpperCase()}
+            statusLabel={ledStatus.toUpperCase()}
             statusTone={
-              live.ledStatus === "red"
+              ledStatus === "red"
                 ? "alarm"
-                : live.ledStatus === "amber"
+                : ledStatus === "amber"
                   ? "warning"
                   : "safe"
             }

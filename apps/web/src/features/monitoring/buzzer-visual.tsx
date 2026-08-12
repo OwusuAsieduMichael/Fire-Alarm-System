@@ -8,7 +8,9 @@ import { useDeviceStore } from "@/stores/device-store";
 import { cn } from "@/lib/utils";
 
 export function BuzzerVisual() {
-  const active = useDeviceStore((s) => s.live.buzzerActive);
+  const deviceActive = useDeviceStore((s) => s.live.buzzerActive);
+  const teamLedStatus = useDeviceStore((s) => s.teamLedStatus);
+  const active = deviceActive || teamLedStatus === "red";
 
   return (
     <Card>
